@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+
+    <gradient
+        android:startColor="@color/level_1"
+        android:centerColor="@color/level_3"
+        android:endColor="@color/level_5"
+        android:angle="0"
+        android:centerX="0.5" />
+
+    <corners android:radius="12dp" />
+
+    <!-- Убрали stroke с черным цветом -->
+
+</shape>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <!-- Наши цвета -->
+    <color name="blue_primary">#2196F3</color>
+    <color name="blue_dark">#1976D2</color>
+    <color name="blue_light">#BBDEFB</color>
+    <color name="gray_light">#F5F5F5</color>
+    <color name="gray_medium">#E0E0E0</color>
+    <color name="gray_dark">#757575</color>
+
+    <!-- Цвета для шкалы AQI -->
+    <color name="level_1">#00E400</color>
+    <color name="level_2">#FFFF00</color>
+    <color name="level_3">#FF7E00</color>
+    <color name="level_4">#FF0000</color>
+    <color name="level_5">#8F3F97</color>
+
+    <!-- Цвета для светлой темы -->
+    <color name="background_default">@color/gray_light</color>
+    <color name="text_primary_default">@color/black</color>
+    <color name="text_secondary_default">@color/gray_dark</color>
+    <color name="card_background_default">@color/white</color>
+
+    <!-- Цвета для линий графика в светлой теме -->
+    <color name="chart_temperature">#FF0000</color>
+    <color name="chart_humidity">#0000FF</color>
+    <color name="chart_pressure">#00FF00</color>
+    <color name="chart_aqi">#FF00FF</color>
+    <color name="chart_tvoc">#FFA500</color>
+    <color name="chart_co2">#8B4513</color>
+</resources>

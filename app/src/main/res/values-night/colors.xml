@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Цвета для темной темы -->
+    <color name="background_default">#121212</color>
+    <color name="card_background_default">#1E1E1E</color>
+    <color name="text_primary_default">#FFFFFF</color>
+    <color name="text_secondary_default">#B0B0B0</color>
+
+    <!-- Цвета для линий графика в темной теме -->
+    <color name="chart_temperature">#FF6666</color>
+    <color name="chart_humidity">#6666FF</color>
+    <color name="chart_pressure">#66FF66</color>
+    <color name="chart_aqi">#FF66FF</color>
+    <color name="chart_tvoc">#FFB347</color>
+    <color name="chart_co2">#B8865B</color>
+
+    <!-- Цвет для фона загрузочного экрана в темной теме -->
+    <color name="splash_background_night">#121212</color>
+</resources>
