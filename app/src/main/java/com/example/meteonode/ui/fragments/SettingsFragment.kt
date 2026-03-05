@@ -25,8 +25,9 @@ class SettingsFragment : BaseFragment() {
     private var currentTheme = "system" // light, dark, system
 
     // Состояния сворачивания
-    private var isBrightnessExpanded = true
-    private var isScheduleExpanded = true
+    private var isBrightnessExpanded = false  // было true, теперь false
+    private var isScheduleExpanded = false    // было true, теперь false
+    private var isThresholdsExpanded = false  // добавить новую переменную
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -60,8 +61,10 @@ class SettingsFragment : BaseFragment() {
     }
 
     private fun setupCollapsibleSections() {
-        // ПЛАВНОЕ сворачивание яркости
-        var isBrightnessExpanded = true
+        // Сворачивание яркости (изначально свернуто)
+        binding.layoutBrightnessContent.visibility = View.GONE
+        binding.btnToggleBrightness.rotation = 180f
+
         binding.btnToggleBrightness.setOnClickListener {
             animateClick(binding.btnToggleBrightness)
             isBrightnessExpanded = !isBrightnessExpanded
@@ -102,8 +105,10 @@ class SettingsFragment : BaseFragment() {
             }
         }
 
-        // ПЛАВНОЕ сворачивание расписания
-        var isScheduleExpanded = true
+        // Сворачивание расписания (изначально свернуто)
+        binding.layoutScheduleContent.visibility = View.GONE
+        binding.btnToggleSchedule.rotation = 180f
+
         binding.btnToggleSchedule.setOnClickListener {
             animateClick(binding.btnToggleSchedule)
             isScheduleExpanded = !isScheduleExpanded
@@ -137,6 +142,50 @@ class SettingsFragment : BaseFragment() {
                     .start()
 
                 binding.btnToggleSchedule.animate()
+                    .rotation(180f)
+                    .setDuration(400)
+                    .setInterpolator(AccelerateDecelerateInterpolator())
+                    .start()
+            }
+        }
+
+        // Сворачивание пороговых значений (изначально свернуто)
+        binding.layoutThresholdsContent.visibility = View.GONE
+        binding.btnToggleThresholds.rotation = 180f
+
+        binding.btnToggleThresholds.setOnClickListener {
+            animateClick(binding.btnToggleThresholds)
+            isThresholdsExpanded = !isThresholdsExpanded
+
+            if (isThresholdsExpanded) {
+                // Разворачивание
+                binding.layoutThresholdsContent.visibility = View.VISIBLE
+                binding.layoutThresholdsContent.animate()
+                    .alpha(1f)
+                    .translationY(0f)
+                    .setDuration(400)
+                    .setInterpolator(AccelerateDecelerateInterpolator())
+                    .start()
+
+                binding.btnToggleThresholds.animate()
+                    .rotation(0f)
+                    .setDuration(400)
+                    .setInterpolator(AccelerateDecelerateInterpolator())
+                    .start()
+            } else {
+                // Сворачивание
+                binding.layoutThresholdsContent.animate()
+                    .alpha(0f)
+                    .translationY(-20f)
+                    .setDuration(300)
+                    .setInterpolator(AccelerateDecelerateInterpolator())
+                    .withEndAction {
+                        binding.layoutThresholdsContent.visibility = View.GONE
+                        binding.layoutThresholdsContent.translationY = 0f
+                    }
+                    .start()
+
+                binding.btnToggleThresholds.animate()
                     .rotation(180f)
                     .setDuration(400)
                     .setInterpolator(AccelerateDecelerateInterpolator())
@@ -213,17 +262,21 @@ class SettingsFragment : BaseFragment() {
             "light" -> {
                 binding.tvLightTheme.isSelected = true
                 binding.tvLightTheme.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.white))
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
             }
             "dark" -> {
                 binding.tvDarkTheme.isSelected = true
                 binding.tvDarkTheme.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.white))
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
             }
             "system" -> {
                 binding.tvSystemTheme.isSelected = true
                 binding.tvSystemTheme.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.white))
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
             }
         }
 
+        // СОХРАНЯЕМ ТЕМУ
         with(sharedPref.edit()) {
             putString("theme", theme)
             apply()
@@ -493,13 +546,32 @@ class SettingsFragment : BaseFragment() {
     }
 
     private fun loadSavedSettings() {
+        // Загружаем тему
         currentTheme = sharedPref.getString("theme", "system") ?: "system"
+
+        // Применяем загруженную тему
+        when (currentTheme) {
+            "light" -> {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+            }
+            "dark" -> {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+            }
+            "system" -> {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+            }
+        }
+
+        // Загружаем уведомления
         val notifications = sharedPref.getBoolean("notifications", true)
         binding.switchNotifications.isChecked = notifications
-    }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
+        // Управляем видимостью контента уведомлений в зависимости от состояния
+        if (notifications) {
+            binding.layoutNotificationsContent.visibility = View.VISIBLE
+            binding.layoutNotificationsContent.alpha = 1f
+        } else {
+            binding.layoutNotificationsContent.visibility = View.GONE
+        }
     }
 }

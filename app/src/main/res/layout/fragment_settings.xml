@@ -96,7 +96,7 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:gravity="center"
-                    android:background="@color/gray_light"
+                    android:background="@color/card_background_default"
                     android:padding="4dp"
                     android:weightSum="3">
 
@@ -155,6 +155,7 @@
         </com.google.android.material.card.MaterialCardView>
 
         <!-- ПОРОГОВЫЕ ЗНАЧЕНИЯ -->
+        <!-- ПОРОГОВЫЕ ЗНАЧЕНИЯ (СВОРАЧИВАЕМЫЕ) -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardThresholds"
             android:layout_width="match_parent"
@@ -172,12 +173,13 @@
                 android:orientation="vertical"
                 android:padding="16dp">
 
+                <!-- Заголовок с кнопкой сворачивания -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
-                    android:layout_marginBottom="16dp">
+                    android:layout_marginBottom="8dp">
 
                     <ImageView
                         android:layout_width="32dp"
@@ -195,212 +197,232 @@
                         android:textStyle="bold"
                         android:textColor="@color/text_primary_default"/>
 
+                    <ImageButton
+                        android:id="@+id/btnToggleThresholds"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:src="@drawable/ic_arrow_up"
+                        android:tint="@color/blue_primary"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:padding="8dp"
+                        android:rotation="0"/>
+
                 </LinearLayout>
 
-                <!-- Температура -->
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Температура"
-                    android:textSize="14sp"
-                    android:textColor="@color/text_primary_default"
-                    android:layout_marginBottom="8dp"/>
-
+                <!-- Сворачиваемый контент -->
                 <LinearLayout
+                    android:id="@+id/layoutThresholdsContent"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:layout_marginBottom="16dp">
+                    android:orientation="vertical"
+                    android:visibility="visible">
 
+                    <!-- Температура -->
                     <TextView
-                        android:id="@+id/tvTempMin"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:text="16°"
-                        android:textSize="12sp"
-                        android:textColor="@color/blue_primary"
-                        android:gravity="center"
-                        android:background="@drawable/threshold_circle"/>
-
-                    <SeekBar
-                        android:id="@+id/seekBarTemp"
-                        android:layout_width="0dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginStart="12dp"
-                        android:layout_marginEnd="12dp"
-                        android:max="30"
-                        android:progress="22"
-                        android:progressDrawable="@drawable/seekbar_gradient"
-                        android:thumb="@drawable/seekbar_thumb"
-                        android:thumbTint="@color/blue_primary"
-                        android:splitTrack="false"/>
+                        android:text="Температура"
+                        android:textSize="14sp"
+                        android:textColor="@color/text_primary_default"
+                        android:layout_marginBottom="8dp"/>
 
-                    <TextView
-                        android:id="@+id/tvTempMax"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:text="28°"
-                        android:textSize="12sp"
-                        android:textColor="@color/red"
-                        android:gravity="center"
-                        android:background="@drawable/threshold_circle"/>
-
-                </LinearLayout>
-
-                <!-- Влажность -->
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Влажность"
-                    android:textSize="14sp"
-                    android:textColor="@color/text_primary_default"
-                    android:layout_marginBottom="8dp"/>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:layout_marginBottom="16dp">
-
-                    <TextView
-                        android:id="@+id/tvHumMin"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:text="30%"
-                        android:textSize="12sp"
-                        android:textColor="@color/blue_primary"
-                        android:gravity="center"
-                        android:background="@drawable/threshold_circle"/>
-
-                    <SeekBar
-                        android:id="@+id/seekBarHum"
-                        android:layout_width="0dp"
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginStart="12dp"
-                        android:layout_marginEnd="12dp"
-                        android:max="30"
-                        android:progress="22"
-                        android:progressDrawable="@drawable/seekbar_gradient"
-                        android:thumb="@drawable/seekbar_thumb"
-                        android:thumbTint="@color/blue_primary"
-                        android:splitTrack="false"/>
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="16dp">
 
+                        <TextView
+                            android:id="@+id/tvTempMin"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:text="16°"
+                            android:textSize="12sp"
+                            android:textColor="@color/blue_primary"
+                            android:gravity="center"
+                            android:background="@drawable/threshold_circle"/>
+
+                        <SeekBar
+                            android:id="@+id/seekBarTemp"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="12dp"
+                            android:layout_marginEnd="12dp"
+                            android:max="30"
+                            android:progress="22"
+                            android:progressDrawable="@drawable/seekbar_gradient"
+                            android:thumb="@drawable/seekbar_thumb"
+                            android:thumbTint="@color/blue_primary"
+                            android:splitTrack="false"/>
+
+                        <TextView
+                            android:id="@+id/tvTempMax"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:text="28°"
+                            android:textSize="12sp"
+                            android:textColor="@color/red"
+                            android:gravity="center"
+                            android:background="@drawable/threshold_circle"/>
+
+                    </LinearLayout>
+
+                    <!-- Влажность -->
                     <TextView
-                        android:id="@+id/tvHumMax"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:text="70%"
-                        android:textSize="12sp"
-                        android:textColor="@color/red"
-                        android:gravity="center"
-                        android:background="@drawable/threshold_circle"/>
-
-                </LinearLayout>
-
-                <!-- Качество воздуха (AQI) -->
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Качество воздуха (AQI)"
-                    android:textSize="14sp"
-                    android:textColor="@color/text_primary_default"
-                    android:layout_marginBottom="8dp"/>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:layout_marginBottom="8dp">
-
-                    <TextView
-                        android:id="@+id/tvAqiMin"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:text="1"
-                        android:textSize="12sp"
-                        android:textColor="@color/level_1"
-                        android:gravity="center"
-                        android:background="@drawable/threshold_circle"/>
-
-                    <SeekBar
-                        android:id="@+id/seekBarAqi"
-                        android:layout_width="0dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginStart="12dp"
-                        android:layout_marginEnd="12dp"
-                        android:max="5"
-                        android:progress="3"
-                        android:progressDrawable="@drawable/seekbar_gradient_aqi"
-                        android:thumb="@drawable/seekbar_thumb"
-                        android:splitTrack="false"/>
+                        android:text="Влажность"
+                        android:textSize="14sp"
+                        android:textColor="@color/text_primary_default"
+                        android:layout_marginBottom="8dp"/>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="16dp">
+
+                        <TextView
+                            android:id="@+id/tvHumMin"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:text="30%"
+                            android:textSize="12sp"
+                            android:textColor="@color/blue_primary"
+                            android:gravity="center"
+                            android:background="@drawable/threshold_circle"/>
+
+                        <SeekBar
+                            android:id="@+id/seekBarHum"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="12dp"
+                            android:layout_marginEnd="12dp"
+                            android:max="30"
+                            android:progress="22"
+                            android:progressDrawable="@drawable/seekbar_gradient"
+                            android:thumb="@drawable/seekbar_thumb"
+                            android:thumbTint="@color/blue_primary"
+                            android:splitTrack="false"/>
+
+                        <TextView
+                            android:id="@+id/tvHumMax"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:text="70%"
+                            android:textSize="12sp"
+                            android:textColor="@color/red"
+                            android:gravity="center"
+                            android:background="@drawable/threshold_circle"/>
+
+                    </LinearLayout>
+
+                    <!-- Качество воздуха (AQI) -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Качество воздуха (AQI)"
+                        android:textSize="14sp"
+                        android:textColor="@color/text_primary_default"
+                        android:layout_marginBottom="8dp"/>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="8dp">
+
+                        <TextView
+                            android:id="@+id/tvAqiMin"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:text="1"
+                            android:textSize="12sp"
+                            android:textColor="@color/level_1"
+                            android:gravity="center"
+                            android:background="@drawable/threshold_circle"/>
+
+                        <SeekBar
+                            android:id="@+id/seekBarAqi"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="12dp"
+                            android:layout_marginEnd="12dp"
+                            android:max="5"
+                            android:progress="3"
+                            android:progressDrawable="@drawable/seekbar_gradient_aqi"
+                            android:thumb="@drawable/seekbar_thumb"
+                            android:splitTrack="false"/>
+
+                        <TextView
+                            android:id="@+id/tvAqiMax"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:text="5"
+                            android:textSize="12sp"
+                            android:textColor="@color/level_5"
+                            android:gravity="center"
+                            android:background="@drawable/threshold_circle"/>
+
+                    </LinearLayout>
+
+                    <!-- Предпросмотр шкалы AQI -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="8dp"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginBottom="8dp">
+
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:background="@color/level_1"/>
+
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:background="@color/level_2"/>
+
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:background="@color/level_3"/>
+
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:background="@color/level_4"/>
+
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:background="@color/level_5"/>
+
+                    </LinearLayout>
 
                     <TextView
-                        android:id="@+id/tvAqiMax"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:text="5"
-                        android:textSize="12sp"
-                        android:textColor="@color/level_5"
+                        android:id="@+id/tvAqiWarning"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="⚠️ Превышение порога вызовет уведомление"
+                        android:textSize="10sp"
+                        android:textColor="@color/text_secondary_default"
                         android:gravity="center"
-                        android:background="@drawable/threshold_circle"/>
+                        android:layout_marginTop="8dp"/>
 
                 </LinearLayout>
-
-                <!-- Предпросмотр шкалы AQI -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="8dp"
-                    android:orientation="horizontal"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginBottom="8dp">
-
-                    <View
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@color/level_1"/>
-
-                    <View
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@color/level_2"/>
-
-                    <View
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@color/level_3"/>
-
-                    <View
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@color/level_4"/>
-
-                    <View
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@color/level_5"/>
-
-                </LinearLayout>
-
-                <TextView
-                    android:id="@+id/tvAqiWarning"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="⚠️ Превышение порога вызовет уведомление"
-                    android:textSize="10sp"
-                    android:textColor="@color/text_secondary_default"
-                    android:gravity="center"
-                    android:layout_marginTop="8dp"/>
 
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>

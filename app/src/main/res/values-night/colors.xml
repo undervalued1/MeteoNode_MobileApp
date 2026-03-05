@@ -15,9 +15,7 @@
     <color name="chart_co2">#B8865B</color>
     
     <!-- Фон для загрузочного экрана -->
-    <color name="splash_background_night">#121212</color>
-    <color name="dark_background">#121212</color>
-    
+
     <!-- Цвета для UI элементов -->
     <color name="gray_light">#2C2C2C</color>
     <color name="gray_medium">#3C3C3C</color>
@@ -26,4 +24,9 @@
     
     <!-- Цвет для фона переключателя темы -->
     <color name="theme_switch_background">#2C2C2C</color>
+
+    <!-- Цвет для загрузочного экрана в темной теме -->
+    <color name="splash_background_night">#121212</color>
+
+
 </resources>

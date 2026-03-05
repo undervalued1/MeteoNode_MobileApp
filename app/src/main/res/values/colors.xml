@@ -40,5 +40,9 @@
     <color name="red">#FF0000</color>
     <color name="transparent">#00000000</color>
 
+    <color name="theme_switch_background">@color/gray_light</color>
+
+    <!-- Цвет для загрузочного экрана в темной теме (для светлой темы он не используется, но добавим для безопасности) -->
+    <color name="splash_background_night">#121212</color>
 
 </resources>
