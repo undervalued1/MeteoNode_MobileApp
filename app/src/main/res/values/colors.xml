@@ -36,4 +36,9 @@
     <color name="chart_aqi">#FF00FF</color>
     <color name="chart_tvoc">#FFA500</color>
     <color name="chart_co2">#8B4513</color>
+
+    <color name="red">#FF0000</color>
+    <color name="transparent">#00000000</color>
+
+
 </resources>

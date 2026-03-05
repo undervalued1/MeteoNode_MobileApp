@@ -1,14 +1,16 @@
 package com.example.meteonode.ui.fragments
-import com.github.mikephil.charting.components.XAxis
+
+import android.animation.ValueAnimator
 import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
+import android.view.animation.AccelerateDecelerateInterpolator
 import com.example.meteonode.R
 import com.example.meteonode.databinding.FragmentStatisticsBinding
 import com.example.meteonode.StatisticsData
+import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
@@ -17,15 +19,15 @@ import com.google.android.material.snackbar.Snackbar
 import java.text.SimpleDateFormat
 import java.util.*
 
-class StatisticsFragment : Fragment() {
+class StatisticsFragment : BaseFragment() {
 
     private var _binding: FragmentStatisticsBinding? = null
     private val binding get() = _binding!!
 
-    // Данные для графика
     private val allData = mutableListOf<StatisticsData>()
-    private var currentPeriod = "day" // day, week, month, year
+    private var currentPeriod = "day"
     private var isIndicatorsVisible = true
+    private var chartAnimator: ValueAnimator? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -43,16 +45,35 @@ class StatisticsFragment : Fragment() {
         generateDemoData()
         setupListeners()
         updateChart()
+        animateViews()
 
-        // Кнопка сворачивания/разворачивания
         binding.btnToggleIndicators.setOnClickListener {
+            animateClick(binding.btnToggleIndicators)
             isIndicatorsVisible = !isIndicatorsVisible
             if (isIndicatorsVisible) {
                 binding.indicatorsContainer.visibility = View.VISIBLE
-                binding.btnToggleIndicators.rotation = 0f
+                binding.indicatorsContainer.animate()
+                    .alpha(1f)
+                    .translationY(0f)
+                    .setDuration(300)
+                    .start()
+                binding.btnToggleIndicators.animate()
+                    .rotation(0f)
+                    .setDuration(300)
+                    .start()
             } else {
-                binding.indicatorsContainer.visibility = View.GONE
-                binding.btnToggleIndicators.rotation = 180f
+                binding.indicatorsContainer.animate()
+                    .alpha(0f)
+                    .translationY(-20f)
+                    .setDuration(300)
+                    .withEndAction {
+                        binding.indicatorsContainer.visibility = View.GONE
+                    }
+                    .start()
+                binding.btnToggleIndicators.animate()
+                    .rotation(180f)
+                    .setDuration(300)
+                    .start()
             }
         }
     }
@@ -60,26 +81,43 @@ class StatisticsFragment : Fragment() {
     private fun setupChart() {
         val chart = binding.lineChart
 
-        chart.description.isEnabled = false
+        chart.setBackgroundColor(resources.getColor(R.color.card_background_default, null))
+        chart.setDrawGridBackground(false)
+        chart.setDrawBorders(false)
         chart.setTouchEnabled(true)
         chart.isDragEnabled = true
         chart.setScaleEnabled(true)
         chart.setPinchZoom(true)
+        chart.animateX(1800)
 
-        // Настройка осей
-        chart.xAxis.position = XAxis.XAxisPosition.BOTTOM
-        chart.xAxis.setDrawGridLines(false)
-        chart.xAxis.granularity = 1f
-        chart.xAxis.textSize = 10f
-        chart.xAxis.textColor = resources.getColor(R.color.text_primary_default, null)
+        val xAxis = chart.xAxis
+        xAxis.position = XAxis.XAxisPosition.BOTTOM
+        xAxis.setDrawGridLines(false)
+        xAxis.setDrawAxisLine(true)
+        xAxis.axisLineColor = resources.getColor(R.color.blue_light, null)
+        xAxis.axisLineWidth = 2f
+        xAxis.textColor = resources.getColor(R.color.text_primary_default, null)
+        xAxis.textSize = 11f
+        xAxis.granularity = 1f
 
-        chart.axisLeft.textSize = 10f
-        chart.axisLeft.setDrawGridLines(true)
-        chart.axisLeft.textColor = resources.getColor(R.color.text_primary_default, null)
+        val leftAxis = chart.axisLeft
+        leftAxis.setDrawGridLines(true)
+        leftAxis.gridColor = resources.getColor(R.color.blue_light, null)
+        leftAxis.gridLineWidth = 0.5f
+        leftAxis.axisLineColor = resources.getColor(R.color.blue_primary, null)
+        leftAxis.axisLineWidth = 2f
+        leftAxis.textColor = resources.getColor(R.color.text_primary_default, null)
+        leftAxis.textSize = 11f
+        leftAxis.setDrawZeroLine(false)
 
         chart.axisRight.isEnabled = false
         chart.legend.isEnabled = false
-        chart.animateX(1000)
+        chart.description.isEnabled = false
+
+        val mv = CustomMarkerView(requireContext(), R.layout.marker_view)
+        mv.setChartView(chart)
+        chart.marker = mv
+        chart.setDrawMarkerViews(true)
     }
 
     private fun generateDemoData() {
@@ -90,30 +128,18 @@ class StatisticsFragment : Fragment() {
             val timestamp = calendar.timeInMillis
             calendar.add(Calendar.DAY_OF_YEAR, -1)
 
-            val baseTemp = 22.0f
-            val baseHum = 45.0f
-            val basePress = 755.0f
-            val baseAQI = 3.0f
-            val baseTVOC = 120.0f
-            val baseCO2 = 450.0f
-
             val dayFactor = i / 30.0f
+            val waveFactor = Math.sin(i * 0.3).toFloat()
 
-            val temperature = baseTemp + (random.nextFloat() * 4 - 2) + dayFactor * 0.5f
-            val humidity = baseHum + (random.nextFloat() * 10 - 5) - dayFactor * 0.3f
-            val pressure = basePress + (random.nextFloat() * 6 - 3) - dayFactor * 0.2f
-            val aqi = (baseAQI + (random.nextFloat() * 2 - 1)).toInt().coerceIn(1, 5)
-            val tvoc = baseTVOC + (random.nextFloat() * 40 - 20) + dayFactor * 2f
-            val co2 = baseCO2 + (random.nextFloat() * 100 - 50) + dayFactor * 5f
+            val temperature = 22f + waveFactor * 3 + dayFactor * 0.3f + random.nextFloat()
+            val humidity = 50f + waveFactor * 10 - dayFactor * 0.5f + random.nextFloat()
+            val pressure = 755f + waveFactor * 5 + random.nextFloat()
+            val aqi = (3 + (waveFactor * 1.5).toInt()).coerceIn(1, 5)
+            val tvoc = 100f + waveFactor * 30 + random.nextFloat() * 10
+            val co2 = 400f + waveFactor * 100 + random.nextFloat() * 20
 
             allData.add(StatisticsData(
-                timestamp,
-                temperature,
-                humidity,
-                pressure,
-                aqi,
-                tvoc,
-                co2
+                timestamp, temperature, humidity, pressure, aqi, tvoc, co2
             ))
         }
 
@@ -122,47 +148,58 @@ class StatisticsFragment : Fragment() {
 
     private fun setupListeners() {
         binding.btnDay.setOnClickListener {
+            animateClick(binding.btnDay)
             currentPeriod = "day"
-            updateChart()
-            Snackbar.make(binding.root, "Статистика за день", Snackbar.LENGTH_SHORT)
+            updateChartWithAnimation()
+            Snackbar.make(binding.root, "Дневная статистика", Snackbar.LENGTH_SHORT)
                 .setBackgroundTint(resources.getColor(R.color.blue_primary, null))
                 .setTextColor(resources.getColor(android.R.color.white, null))
                 .show()
         }
 
         binding.btnWeek.setOnClickListener {
+            animateClick(binding.btnWeek)
             currentPeriod = "week"
-            updateChart()
-            Snackbar.make(binding.root, "Статистика за неделю", Snackbar.LENGTH_SHORT)
+            updateChartWithAnimation()
+            Snackbar.make(binding.root, "Недельная статистика", Snackbar.LENGTH_SHORT)
                 .setBackgroundTint(resources.getColor(R.color.blue_primary, null))
                 .setTextColor(resources.getColor(android.R.color.white, null))
                 .show()
         }
 
         binding.btnMonth.setOnClickListener {
+            animateClick(binding.btnMonth)
             currentPeriod = "month"
-            updateChart()
-            Snackbar.make(binding.root, "Статистика за месяц", Snackbar.LENGTH_SHORT)
+            updateChartWithAnimation()
+            Snackbar.make(binding.root, "Месячная статистика", Snackbar.LENGTH_SHORT)
                 .setBackgroundTint(resources.getColor(R.color.blue_primary, null))
                 .setTextColor(resources.getColor(android.R.color.white, null))
                 .show()
         }
 
         binding.btnYear.setOnClickListener {
+            animateClick(binding.btnYear)
             currentPeriod = "year"
-            updateChart()
-            Snackbar.make(binding.root, "Статистика за год", Snackbar.LENGTH_SHORT)
+            updateChartWithAnimation()
+            Snackbar.make(binding.root, "Годовая статистика", Snackbar.LENGTH_SHORT)
                 .setBackgroundTint(resources.getColor(R.color.blue_primary, null))
                 .setTextColor(resources.getColor(android.R.color.white, null))
                 .show()
         }
 
-        binding.chkTemperature.setOnCheckedChangeListener { _, _ -> updateChart() }
-        binding.chkHumidity.setOnCheckedChangeListener { _, _ -> updateChart() }
-        binding.chkPressure.setOnCheckedChangeListener { _, _ -> updateChart() }
-        binding.chkAQI.setOnCheckedChangeListener { _, _ -> updateChart() }
-        binding.chkTVOC.setOnCheckedChangeListener { _, _ -> updateChart() }
-        binding.chkCO2.setOnCheckedChangeListener { _, _ -> updateChart() }
+        binding.chkTemperature.setOnCheckedChangeListener { _, _ -> updateChartWithAnimation() }
+        binding.chkHumidity.setOnCheckedChangeListener { _, _ -> updateChartWithAnimation() }
+        binding.chkPressure.setOnCheckedChangeListener { _, _ -> updateChartWithAnimation() }
+        binding.chkAQI.setOnCheckedChangeListener { _, _ -> updateChartWithAnimation() }
+        binding.chkTVOC.setOnCheckedChangeListener { _, _ -> updateChartWithAnimation() }
+        binding.chkCO2.setOnCheckedChangeListener { _, _ -> updateChartWithAnimation() }
+    }
+
+    private fun updateChartWithAnimation() {
+        chartAnimator?.cancel()
+        updateChart()
+
+        animatePulse(binding.lineChart)
     }
 
     private fun updateChart() {
@@ -173,42 +210,54 @@ class StatisticsFragment : Fragment() {
             val entries = filteredData.mapIndexed { index, data ->
                 Entry(index.toFloat(), data.temperature)
             }
-            dataSets.add(createDataSet(entries, "Температура", R.color.chart_temperature))
+            val dataSet = createBeautifulDataSet(entries, "Температура",
+                resources.getColor(R.color.chart_temperature, null))
+            dataSets.add(dataSet)
         }
 
         if (binding.chkHumidity.isChecked) {
             val entries = filteredData.mapIndexed { index, data ->
                 Entry(index.toFloat(), data.humidity)
             }
-            dataSets.add(createDataSet(entries, "Влажность", R.color.chart_humidity))
+            val dataSet = createBeautifulDataSet(entries, "Влажность",
+                resources.getColor(R.color.chart_humidity, null))
+            dataSets.add(dataSet)
         }
 
         if (binding.chkPressure.isChecked) {
             val entries = filteredData.mapIndexed { index, data ->
                 Entry(index.toFloat(), data.pressure / 10)
             }
-            dataSets.add(createDataSet(entries, "Давление", R.color.chart_pressure))
+            val dataSet = createBeautifulDataSet(entries, "Давление",
+                resources.getColor(R.color.chart_pressure, null))
+            dataSets.add(dataSet)
         }
 
         if (binding.chkAQI.isChecked) {
             val entries = filteredData.mapIndexed { index, data ->
                 Entry(index.toFloat(), data.aqi.toFloat())
             }
-            dataSets.add(createDataSet(entries, "AQI", R.color.chart_aqi))
+            val dataSet = createBeautifulDataSet(entries, "AQI",
+                resources.getColor(R.color.chart_aqi, null))
+            dataSets.add(dataSet)
         }
 
         if (binding.chkTVOC.isChecked) {
             val entries = filteredData.mapIndexed { index, data ->
                 Entry(index.toFloat(), data.tvoc / 10)
             }
-            dataSets.add(createDataSet(entries, "TVOC", R.color.chart_tvoc))
+            val dataSet = createBeautifulDataSet(entries, "TVOC",
+                resources.getColor(R.color.chart_tvoc, null))
+            dataSets.add(dataSet)
         }
 
         if (binding.chkCO2.isChecked) {
             val entries = filteredData.mapIndexed { index, data ->
                 Entry(index.toFloat(), data.co2 / 10)
             }
-            dataSets.add(createDataSet(entries, "CO₂", R.color.chart_co2))
+            val dataSet = createBeautifulDataSet(entries, "CO₂",
+                resources.getColor(R.color.chart_co2, null))
+            dataSets.add(dataSet)
         }
 
         if (dataSets.isEmpty()) {
@@ -230,17 +279,27 @@ class StatisticsFragment : Fragment() {
         binding.lineChart.invalidate()
     }
 
-    private fun createDataSet(entries: List<Entry>, label: String, colorResId: Int): LineDataSet {
-        val color = resources.getColor(colorResId, null)
+    private fun createBeautifulDataSet(entries: List<Entry>, label: String, color: Int): LineDataSet {
         val dataSet = LineDataSet(entries, label)
+
         dataSet.color = color
+        dataSet.lineWidth = 3f
+
+        dataSet.setDrawCircles(true)
         dataSet.setCircleColor(color)
-        dataSet.lineWidth = 2f
-        dataSet.circleRadius = 2f
-        dataSet.setDrawCircleHole(false)
-        dataSet.setDrawValues(false)
+        dataSet.circleRadius = 4f
+        dataSet.circleHoleRadius = 2f
+        dataSet.setDrawCircleHole(true)
+
+        dataSet.setDrawFilled(true)
+        dataSet.fillColor = color
+        dataSet.fillAlpha = 50
+
         dataSet.mode = LineDataSet.Mode.CUBIC_BEZIER
         dataSet.cubicIntensity = 0.2f
+
+        dataSet.setDrawValues(false)
+
         return dataSet
     }
 
@@ -280,12 +339,12 @@ class StatisticsFragment : Fragment() {
             "year" -> SimpleDateFormat("MMM", Locale.getDefault())
             else -> SimpleDateFormat("dd.MM", Locale.getDefault())
         }
-
         return data.map { format.format(Date(it.timestamp)) }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
+        chartAnimator?.cancel()
         _binding = null
     }
 }

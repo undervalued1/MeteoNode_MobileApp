@@ -11,13 +11,15 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- Заголовок -->
+        <!-- Заголовок с анимацией -->
         <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardHeader"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:cardCornerRadius="20dp"
             android:layout_marginBottom="20dp"
-            app:cardBackgroundColor="@color/blue_primary">
+            app:cardBackgroundColor="@color/blue_primary"
+            app:cardElevation="4dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -30,14 +32,15 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Настройки"
-                    android:textSize="28sp"
+                    android:textSize="32sp"
                     android:textStyle="bold"
-                    android:textColor="@color/white"/>
+                    android:textColor="@color/white"
+                    android:layout_marginBottom="4dp"/>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Устройство и приложение"
+                    android:text="Персонализация и безопасность"
                     android:textSize="14sp"
                     android:textColor="@color/white"
                     android:alpha="0.9"/>
@@ -45,13 +48,17 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Настройки устройства -->
+        <!-- ТЕМА ОФОРМЛЕНИЯ -->
         <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardTheme"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:cardCornerRadius="16dp"
-            android:layout_marginBottom="20dp"
-            app:cardBackgroundColor="@color/card_background_default">
+            android:layout_marginBottom="16dp"
+            app:cardBackgroundColor="@color/card_background_default"
+            app:cardElevation="2dp"
+            app:strokeColor="@color/blue_light"
+            app:strokeWidth="1dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -59,66 +66,105 @@
                 android:orientation="vertical"
                 android:padding="16dp">
 
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="16dp">
+
+                    <ImageView
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:src="@drawable/ic_theme"
+                        android:tint="@color/blue_primary"
+                        android:layout_marginEnd="12dp"/>
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Тема оформления"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/text_primary_default"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:background="@color/gray_light"
+                    android:padding="4dp"
+                    android:weightSum="3">
+
+                    <TextView
+                        android:id="@+id/tvLightTheme"
+                        android:layout_width="0dp"
+                        android:layout_height="40dp"
+                        android:layout_weight="1"
+                        android:text="☀️ Светлая"
+                        android:textSize="14sp"
+                        android:gravity="center"
+                        android:background="@drawable/theme_selector_background"
+                        android:textColor="@color/theme_selector_color"
+                        android:clickable="true"
+                        android:focusable="true"/>
+
+                    <TextView
+                        android:id="@+id/tvDarkTheme"
+                        android:layout_width="0dp"
+                        android:layout_height="40dp"
+                        android:layout_weight="1"
+                        android:text="🌙 Темная"
+                        android:textSize="14sp"
+                        android:gravity="center"
+                        android:background="@drawable/theme_selector_background"
+                        android:textColor="@color/theme_selector_color"
+                        android:clickable="true"
+                        android:focusable="true"/>
+
+                    <TextView
+                        android:id="@+id/tvSystemTheme"
+                        android:layout_width="0dp"
+                        android:layout_height="40dp"
+                        android:layout_weight="1"
+                        android:text="⚙️ Системная"
+                        android:textSize="14sp"
+                        android:gravity="center"
+                        android:background="@drawable/theme_selector_background"
+                        android:textColor="@color/theme_selector_color"
+                        android:clickable="true"
+                        android:focusable="true"/>
+
+                </LinearLayout>
+
                 <TextView
+                    android:id="@+id/tvThemeAnimation"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Настройки устройства"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/blue_dark"
-                    android:layout_marginBottom="16dp"/>
-
-                <com.google.android.material.textfield.TextInputLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="12dp"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/etTargetTemperature"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="Целевая температура (°C)"
-                        android:inputType="numberDecimal"
-                        android:text="22.5"
-                        android:textColor="@color/text_primary_default"/>
-
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <com.google.android.material.textfield.TextInputLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="16dp"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/etTargetHumidity"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="Целевая влажность (%)"
-                        android:inputType="number"
-                        android:text="45"
-                        android:textColor="@color/text_primary_default"/>
-
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <Button
-                    android:id="@+id/btnSaveSettings"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Сохранить настройки устройства"
-                    style="@style/Widget.MaterialComponents.Button"/>
+                    android:text="✨ Выберите тему оформления"
+                    android:textSize="12sp"
+                    android:textColor="@color/blue_primary"
+                    android:gravity="center"
+                    android:layout_marginTop="12dp"/>
 
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Настройки приложения -->
+        <!-- ПОРОГОВЫЕ ЗНАЧЕНИЯ -->
         <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardThresholds"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:cardCornerRadius="16dp"
-            android:layout_marginBottom="20dp"
-            app:cardBackgroundColor="@color/card_background_default">
+            android:layout_marginBottom="16dp"
+            app:cardBackgroundColor="@color/card_background_default"
+            app:cardElevation="2dp"
+            app:strokeColor="@color/blue_light"
+            app:strokeWidth="1dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -126,110 +172,1100 @@
                 android:orientation="vertical"
                 android:padding="16dp">
 
-                <TextView
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Настройки приложения"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/blue_dark"
-                    android:layout_marginBottom="16dp"/>
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="16dp">
 
-                <!-- Темная тема -->
-                <com.google.android.material.switchmaterial.SwitchMaterial
-                    android:id="@+id/switchDarkMode"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Темная тема"
-                    android:textColor="@color/text_primary_default"
-                    android:layout_marginBottom="12dp"/>
+                    <ImageView
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:src="@drawable/ic_warning"
+                        android:tint="@color/blue_primary"
+                        android:layout_marginEnd="12dp"/>
 
-                <!-- Уведомления -->
-                <com.google.android.material.switchmaterial.SwitchMaterial
-                    android:id="@+id/switchNotifications"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Уведомления"
-                    android:textColor="@color/text_primary_default"
-                    android:checked="true"
-                    android:layout_marginBottom="16dp"/>
-
-                <!-- Единицы измерения -->
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Единицы измерения"
-                    android:textSize="16sp"
-                    android:textColor="@color/text_primary_default"
-                    android:layout_marginBottom="8dp"/>
-
-                <RadioGroup
-                    android:id="@+id/radioGroupUnits"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <RadioButton
-                        android:id="@+id/radioMetric"
+                    <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Метрические"
-                        android:textColor="@color/text_primary_default"
-                        android:checked="true"/>
-
-                    <RadioButton
-                        android:id="@+id/radioImperial"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Имперские"
+                        android:text="Пороговые значения"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
                         android:textColor="@color/text_primary_default"/>
 
-                </RadioGroup>
+                </LinearLayout>
 
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
-
-        <!-- О приложении -->
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:cardCornerRadius="16dp"
-            app:cardBackgroundColor="@color/card_background_default">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="О приложении"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/blue_dark"
-                    android:layout_marginBottom="8dp"/>
-
+                <!-- Температура -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="MeteoNode v1.0"
-                    android:textSize="16sp"
-                    android:textColor="@color/text_primary_default"
-                    android:layout_marginBottom="4dp"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Умный контроль микроклимата"
+                    android:text="Температура"
                     android:textSize="14sp"
-                    android:textColor="@color/text_secondary_default"/>
+                    android:textColor="@color/text_primary_default"
+                    android:layout_marginBottom="8dp"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="16dp">
+
+                    <TextView
+                        android:id="@+id/tvTempMin"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:text="16°"
+                        android:textSize="12sp"
+                        android:textColor="@color/blue_primary"
+                        android:gravity="center"
+                        android:background="@drawable/threshold_circle"/>
+
+                    <SeekBar
+                        android:id="@+id/seekBarTemp"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="12dp"
+                        android:layout_marginEnd="12dp"
+                        android:max="30"
+                        android:progress="22"
+                        android:progressDrawable="@drawable/seekbar_gradient"
+                        android:thumb="@drawable/seekbar_thumb"
+                        android:thumbTint="@color/blue_primary"
+                        android:splitTrack="false"/>
+
+                    <TextView
+                        android:id="@+id/tvTempMax"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:text="28°"
+                        android:textSize="12sp"
+                        android:textColor="@color/red"
+                        android:gravity="center"
+                        android:background="@drawable/threshold_circle"/>
+
+                </LinearLayout>
+
+                <!-- Влажность -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Влажность"
+                    android:textSize="14sp"
+                    android:textColor="@color/text_primary_default"
+                    android:layout_marginBottom="8dp"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="16dp">
+
+                    <TextView
+                        android:id="@+id/tvHumMin"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:text="30%"
+                        android:textSize="12sp"
+                        android:textColor="@color/blue_primary"
+                        android:gravity="center"
+                        android:background="@drawable/threshold_circle"/>
+
+                    <SeekBar
+                        android:id="@+id/seekBarHum"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="12dp"
+                        android:layout_marginEnd="12dp"
+                        android:max="30"
+                        android:progress="22"
+                        android:progressDrawable="@drawable/seekbar_gradient"
+                        android:thumb="@drawable/seekbar_thumb"
+                        android:thumbTint="@color/blue_primary"
+                        android:splitTrack="false"/>
+
+                    <TextView
+                        android:id="@+id/tvHumMax"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:text="70%"
+                        android:textSize="12sp"
+                        android:textColor="@color/red"
+                        android:gravity="center"
+                        android:background="@drawable/threshold_circle"/>
+
+                </LinearLayout>
+
+                <!-- Качество воздуха (AQI) -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Качество воздуха (AQI)"
+                    android:textSize="14sp"
+                    android:textColor="@color/text_primary_default"
+                    android:layout_marginBottom="8dp"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="8dp">
+
+                    <TextView
+                        android:id="@+id/tvAqiMin"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:text="1"
+                        android:textSize="12sp"
+                        android:textColor="@color/level_1"
+                        android:gravity="center"
+                        android:background="@drawable/threshold_circle"/>
+
+                    <SeekBar
+                        android:id="@+id/seekBarAqi"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="12dp"
+                        android:layout_marginEnd="12dp"
+                        android:max="5"
+                        android:progress="3"
+                        android:progressDrawable="@drawable/seekbar_gradient_aqi"
+                        android:thumb="@drawable/seekbar_thumb"
+                        android:splitTrack="false"/>
+
+                    <TextView
+                        android:id="@+id/tvAqiMax"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:text="5"
+                        android:textSize="12sp"
+                        android:textColor="@color/level_5"
+                        android:gravity="center"
+                        android:background="@drawable/threshold_circle"/>
+
+                </LinearLayout>
+
+                <!-- Предпросмотр шкалы AQI -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="8dp"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp">
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="@color/level_1"/>
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="@color/level_2"/>
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="@color/level_3"/>
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="@color/level_4"/>
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="@color/level_5"/>
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tvAqiWarning"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="⚠️ Превышение порога вызовет уведомление"
+                    android:textSize="10sp"
+                    android:textColor="@color/text_secondary_default"
+                    android:gravity="center"
+                    android:layout_marginTop="8dp"/>
 
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
+
+        <!-- ЯРКОСТЬ ЭКРАНА ПО ВРЕМЕНИ (СВОРАЧИВАЕМАЯ) -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardBrightness"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="16dp"
+            android:layout_marginBottom="16dp"
+            app:cardBackgroundColor="@color/card_background_default"
+            app:cardElevation="2dp"
+            app:strokeColor="@color/blue_light"
+            app:strokeWidth="1dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <!-- Заголовок с кнопкой сворачивания -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="8dp">
+
+                    <ImageView
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:src="@drawable/ic_brightness"
+                        android:tint="@color/blue_primary"
+                        android:layout_marginEnd="12dp"/>
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Яркость экрана"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/text_primary_default"/>
+
+                    <ImageButton
+                        android:id="@+id/btnToggleBrightness"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:src="@drawable/ic_arrow_up"
+                        android:tint="@color/blue_primary"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:padding="8dp"
+                        android:rotation="0"/>
+
+                </LinearLayout>
+
+                <!-- Сворачиваемый контент -->
+                <LinearLayout
+                    android:id="@+id/layoutBrightnessContent"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="visible">
+
+                    <!-- Автояркость -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="16dp"
+                        android:background="@drawable/notification_item_background"
+                        android:padding="12dp">
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/ic_auto"
+                            android:tint="@color/blue_primary"
+                            android:layout_marginEnd="12dp"/>
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Автоматическая яркость"
+                            android:textSize="14sp"
+                            android:textColor="@color/text_primary_default"/>
+
+                        <androidx.appcompat.widget.SwitchCompat
+                            android:id="@+id/switchAutoBrightness"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
+
+                    </LinearLayout>
+
+                    <!-- Дневная яркость -->
+                    <LinearLayout
+                        android:id="@+id/layoutDayBrightness"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_marginBottom="16dp"
+                        android:background="@drawable/notification_item_background"
+                        android:padding="12dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:layout_marginBottom="8dp">
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:src="@drawable/ic_sun"
+                                android:tint="@color/blue_primary"
+                                android:layout_marginEnd="8dp"/>
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Дневная яркость"
+                                android:textSize="14sp"
+                                android:textColor="@color/text_primary_default"/>
+
+                            <TextView
+                                android:id="@+id/tvDayBrightness"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="80%"
+                                android:textSize="14sp"
+                                android:textColor="@color/blue_primary"
+                                android:textStyle="bold"/>
+
+                        </LinearLayout>
+
+                        <SeekBar
+                            android:id="@+id/seekBarDay"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:max="100"
+                            android:progress="80"
+                            android:progressDrawable="@drawable/seekbar_gradient"
+                            android:thumb="@drawable/seekbar_thumb"
+                            android:thumbTint="@color/blue_primary"
+                            android:splitTrack="false"/>
+
+                    </LinearLayout>
+
+                    <!-- Ночная яркость -->
+                    <LinearLayout
+                        android:id="@+id/layoutNightBrightness"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_marginBottom="16dp"
+                        android:background="@drawable/notification_item_background"
+                        android:padding="12dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:layout_marginBottom="8dp">
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:src="@drawable/ic_moon"
+                                android:tint="@color/blue_primary"
+                                android:layout_marginEnd="8dp"/>
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Ночная яркость"
+                                android:textSize="14sp"
+                                android:textColor="@color/text_primary_default"/>
+
+                            <TextView
+                                android:id="@+id/tvNightBrightness"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="20%"
+                                android:textSize="14sp"
+                                android:textColor="@color/blue_primary"
+                                android:textStyle="bold"/>
+
+                        </LinearLayout>
+
+                        <SeekBar
+                            android:id="@+id/seekBarNight"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:max="100"
+                            android:progress="20"
+                            android:progressDrawable="@drawable/seekbar_gradient"
+                            android:thumb="@drawable/seekbar_thumb"
+                            android:thumbTint="@color/blue_primary"
+                            android:splitTrack="false"/>
+
+                    </LinearLayout>
+
+                    <!-- Расписание (сворачиваемое) -->
+                    <!-- Расписание (сворачиваемое) -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:background="@drawable/notification_item_background"
+                        android:padding="12dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:layout_marginBottom="8dp">
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:src="@drawable/ic_time"
+                                android:tint="@color/blue_primary"
+                                android:layout_marginEnd="8dp"/>
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Расписание по дням"
+                                android:textSize="14sp"
+                                android:textColor="@color/text_primary_default"/>
+
+                            <ImageButton
+                                android:id="@+id/btnToggleSchedule"
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:src="@drawable/ic_arrow_up"
+                                android:tint="@color/blue_primary"
+                                android:background="?attr/selectableItemBackgroundBorderless"
+                                android:rotation="0"/>
+
+                        </LinearLayout>
+
+                        <!-- Сворачиваемое расписание -->
+                        <LinearLayout
+                            android:id="@+id/layoutScheduleContent"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:visibility="visible">
+
+                            <!-- Понедельник -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:gravity="center_vertical"
+                                android:layout_marginBottom="8dp"
+                                android:padding="4dp">
+
+                                <TextView
+                                    android:layout_width="50dp"
+                                    android:layout_height="wrap_content"
+                                    android:text="Пн"
+                                    android:textSize="12sp"
+                                    android:textColor="@color/blue_primary"
+                                    android:textStyle="bold"/>
+
+                                <TextView
+                                    android:id="@+id/tvMonStart"
+                                    android:layout_width="45dp"
+                                    android:layout_height="28dp"
+                                    android:text="07:00"
+                                    android:textSize="11sp"
+                                    android:textColor="@color/text_primary_default"
+                                    android:gravity="center"
+                                    android:background="@drawable/time_selector"
+                                    android:layout_marginEnd="4dp"/>
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="—"
+                                    android:textColor="@color/text_secondary_default"
+                                    android:layout_marginEnd="4dp"/>
+
+                                <TextView
+                                    android:id="@+id/tvMonEnd"
+                                    android:layout_width="45dp"
+                                    android:layout_height="28dp"
+                                    android:text="20:00"
+                                    android:textSize="11sp"
+                                    android:textColor="@color/text_primary_default"
+                                    android:gravity="center"
+                                    android:background="@drawable/time_selector"/>
+
+                            </LinearLayout>
+
+                            <!-- Вторник -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:gravity="center_vertical"
+                                android:layout_marginBottom="8dp"
+                                android:padding="4dp">
+
+                                <TextView
+                                    android:layout_width="50dp"
+                                    android:layout_height="wrap_content"
+                                    android:text="Вт"
+                                    android:textSize="12sp"
+                                    android:textColor="@color/blue_primary"
+                                    android:textStyle="bold"/>
+
+                                <TextView
+                                    android:id="@+id/tvTueStart"
+                                    android:layout_width="45dp"
+                                    android:layout_height="28dp"
+                                    android:text="07:00"
+                                    android:textSize="11sp"
+                                    android:textColor="@color/text_primary_default"
+                                    android:gravity="center"
+                                    android:background="@drawable/time_selector"
+                                    android:layout_marginEnd="4dp"/>
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="—"
+                                    android:textColor="@color/text_secondary_default"
+                                    android:layout_marginEnd="4dp"/>
+
+                                <TextView
+                                    android:id="@+id/tvTueEnd"
+                                    android:layout_width="45dp"
+                                    android:layout_height="28dp"
+                                    android:text="20:00"
+                                    android:textSize="11sp"
+                                    android:textColor="@color/text_primary_default"
+                                    android:gravity="center"
+                                    android:background="@drawable/time_selector"/>
+
+                            </LinearLayout>
+
+                            <!-- Среда -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:gravity="center_vertical"
+                                android:layout_marginBottom="8dp"
+                                android:padding="4dp">
+
+                                <TextView
+                                    android:layout_width="50dp"
+                                    android:layout_height="wrap_content"
+                                    android:text="Ср"
+                                    android:textSize="12sp"
+                                    android:textColor="@color/blue_primary"
+                                    android:textStyle="bold"/>
+
+                                <TextView
+                                    android:id="@+id/tvWedStart"
+                                    android:layout_width="45dp"
+                                    android:layout_height="28dp"
+                                    android:text="07:00"
+                                    android:textSize="11sp"
+                                    android:textColor="@color/text_primary_default"
+                                    android:gravity="center"
+                                    android:background="@drawable/time_selector"
+                                    android:layout_marginEnd="4dp"/>
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="—"
+                                    android:textColor="@color/text_secondary_default"
+                                    android:layout_marginEnd="4dp"/>
+
+                                <TextView
+                                    android:id="@+id/tvWedEnd"
+                                    android:layout_width="45dp"
+                                    android:layout_height="28dp"
+                                    android:text="20:00"
+                                    android:textSize="11sp"
+                                    android:textColor="@color/text_primary_default"
+                                    android:gravity="center"
+                                    android:background="@drawable/time_selector"/>
+
+                            </LinearLayout>
+
+                            <!-- Четверг -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:gravity="center_vertical"
+                                android:layout_marginBottom="8dp"
+                                android:padding="4dp">
+
+                                <TextView
+                                    android:layout_width="50dp"
+                                    android:layout_height="wrap_content"
+                                    android:text="Чт"
+                                    android:textSize="12sp"
+                                    android:textColor="@color/blue_primary"
+                                    android:textStyle="bold"/>
+
+                                <TextView
+                                    android:id="@+id/tvThuStart"
+                                    android:layout_width="45dp"
+                                    android:layout_height="28dp"
+                                    android:text="07:00"
+                                    android:textSize="11sp"
+                                    android:textColor="@color/text_primary_default"
+                                    android:gravity="center"
+                                    android:background="@drawable/time_selector"
+                                    android:layout_marginEnd="4dp"/>
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="—"
+                                    android:textColor="@color/text_secondary_default"
+                                    android:layout_marginEnd="4dp"/>
+
+                                <TextView
+                                    android:id="@+id/tvThuEnd"
+                                    android:layout_width="45dp"
+                                    android:layout_height="28dp"
+                                    android:text="20:00"
+                                    android:textSize="11sp"
+                                    android:textColor="@color/text_primary_default"
+                                    android:gravity="center"
+                                    android:background="@drawable/time_selector"/>
+
+                            </LinearLayout>
+
+                            <!-- Пятница -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:gravity="center_vertical"
+                                android:layout_marginBottom="8dp"
+                                android:padding="4dp">
+
+                                <TextView
+                                    android:layout_width="50dp"
+                                    android:layout_height="wrap_content"
+                                    android:text="Пт"
+                                    android:textSize="12sp"
+                                    android:textColor="@color/blue_primary"
+                                    android:textStyle="bold"/>
+
+                                <TextView
+                                    android:id="@+id/tvFriStart"
+                                    android:layout_width="45dp"
+                                    android:layout_height="28dp"
+                                    android:text="07:00"
+                                    android:textSize="11sp"
+                                    android:textColor="@color/text_primary_default"
+                                    android:gravity="center"
+                                    android:background="@drawable/time_selector"
+                                    android:layout_marginEnd="4dp"/>
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="—"
+                                    android:textColor="@color/text_secondary_default"
+                                    android:layout_marginEnd="4dp"/>
+
+                                <TextView
+                                    android:id="@+id/tvFriEnd"
+                                    android:layout_width="45dp"
+                                    android:layout_height="28dp"
+                                    android:text="20:00"
+                                    android:textSize="11sp"
+                                    android:textColor="@color/text_primary_default"
+                                    android:gravity="center"
+                                    android:background="@drawable/time_selector"/>
+
+                            </LinearLayout>
+
+                            <!-- Суббота -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:gravity="center_vertical"
+                                android:layout_marginBottom="8dp"
+                                android:padding="4dp">
+
+                                <TextView
+                                    android:layout_width="50dp"
+                                    android:layout_height="wrap_content"
+                                    android:text="Сб"
+                                    android:textSize="12sp"
+                                    android:textColor="@color/blue_primary"
+                                    android:textStyle="bold"/>
+
+                                <TextView
+                                    android:id="@+id/tvSatStart"
+                                    android:layout_width="45dp"
+                                    android:layout_height="28dp"
+                                    android:text="09:00"
+                                    android:textSize="11sp"
+                                    android:textColor="@color/text_primary_default"
+                                    android:gravity="center"
+                                    android:background="@drawable/time_selector"
+                                    android:layout_marginEnd="4dp"/>
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="—"
+                                    android:textColor="@color/text_secondary_default"
+                                    android:layout_marginEnd="4dp"/>
+
+                                <TextView
+                                    android:id="@+id/tvSatEnd"
+                                    android:layout_width="45dp"
+                                    android:layout_height="28dp"
+                                    android:text="23:00"
+                                    android:textSize="11sp"
+                                    android:textColor="@color/text_primary_default"
+                                    android:gravity="center"
+                                    android:background="@drawable/time_selector"/>
+
+                            </LinearLayout>
+
+                            <!-- Воскресенье -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:gravity="center_vertical"
+                                android:layout_marginBottom="8dp"
+                                android:padding="4dp">
+
+                                <TextView
+                                    android:layout_width="50dp"
+                                    android:layout_height="wrap_content"
+                                    android:text="Вс"
+                                    android:textSize="12sp"
+                                    android:textColor="@color/blue_primary"
+                                    android:textStyle="bold"/>
+
+                                <TextView
+                                    android:id="@+id/tvSunStart"
+                                    android:layout_width="45dp"
+                                    android:layout_height="28dp"
+                                    android:text="09:00"
+                                    android:textSize="11sp"
+                                    android:textColor="@color/text_primary_default"
+                                    android:gravity="center"
+                                    android:background="@drawable/time_selector"
+                                    android:layout_marginEnd="4dp"/>
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="—"
+                                    android:textColor="@color/text_secondary_default"
+                                    android:layout_marginEnd="4dp"/>
+
+                                <TextView
+                                    android:id="@+id/tvSunEnd"
+                                    android:layout_width="45dp"
+                                    android:layout_height="28dp"
+                                    android:text="23:00"
+                                    android:textSize="11sp"
+                                    android:textColor="@color/text_primary_default"
+                                    android:gravity="center"
+                                    android:background="@drawable/time_selector"/>
+
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- УВЕДОМЛЕНИЯ (КРАСИВЫЕ) -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardNotifications"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="16dp"
+            android:layout_marginBottom="16dp"
+            app:cardBackgroundColor="@color/card_background_default"
+            app:cardElevation="2dp"
+            app:strokeColor="@color/blue_light"
+            app:strokeWidth="1dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <!-- Заголовок -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="16dp">
+
+                    <ImageView
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:src="@drawable/ic_notifications"
+                        android:tint="@color/blue_primary"
+                        android:layout_marginEnd="12dp"/>
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Уведомления"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/text_primary_default"/>
+
+                    <androidx.appcompat.widget.SwitchCompat
+                        android:id="@+id/switchNotifications"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+
+                </LinearLayout>
+
+                <!-- Список уведомлений в виде красивых карточек -->
+                <LinearLayout
+                    android:id="@+id/layoutNotificationsContent"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <!-- Температура -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:background="@drawable/notification_item_background"
+                        android:padding="12dp"
+                        android:layout_marginBottom="8dp">
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/ic_thermostat"
+                            android:tint="@color/blue_primary"
+                            android:layout_marginEnd="12dp"/>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Температура"
+                                android:textSize="14sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/text_primary_default"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="При выходе за пределы диапазона"
+                                android:textSize="10sp"
+                                android:textColor="@color/text_secondary_default"/>
+
+                        </LinearLayout>
+
+                        <CheckBox
+                            android:id="@+id/chkTempAlert"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:buttonTint="@color/blue_primary"/>
+
+                    </LinearLayout>
+
+                    <!-- Влажность -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:background="@drawable/notification_item_background"
+                        android:padding="12dp"
+                        android:layout_marginBottom="8dp">
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/ic_humidity"
+                            android:tint="@color/blue_primary"
+                            android:layout_marginEnd="12dp"/>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Влажность"
+                                android:textSize="14sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/text_primary_default"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="При выходе за пределы диапазона"
+                                android:textSize="10sp"
+                                android:textColor="@color/text_secondary_default"/>
+
+                        </LinearLayout>
+
+                        <CheckBox
+                            android:id="@+id/chkHumAlert"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:buttonTint="@color/blue_primary"/>
+
+                    </LinearLayout>
+
+                    <!-- Качество воздуха -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:background="@drawable/notification_item_background"
+                        android:padding="12dp"
+                        android:layout_marginBottom="8dp">
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/ic_aqi"
+                            android:tint="@color/blue_primary"
+                            android:layout_marginEnd="12dp"/>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Качество воздуха"
+                                android:textSize="14sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/text_primary_default"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="При уровне AQI 4+"
+                                android:textSize="10sp"
+                                android:textColor="@color/text_secondary_default"/>
+
+                        </LinearLayout>
+
+                        <CheckBox
+                            android:id="@+id/chkAqiAlert"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:buttonTint="@color/blue_primary"/>
+
+                    </LinearLayout>
+
+                    <!-- Давление -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:background="@drawable/notification_item_background"
+                        android:padding="12dp"
+                        android:layout_marginBottom="8dp">
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/ic_pressure"
+                            android:tint="@color/blue_primary"
+                            android:layout_marginEnd="12dp"/>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Давление"
+                                android:textSize="14sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/text_primary_default"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="При резких изменениях"
+                                android:textSize="10sp"
+                                android:textColor="@color/text_secondary_default"/>
+
+                        </LinearLayout>
+
+                        <CheckBox
+                            android:id="@+id/chkPressureAlert"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:buttonTint="@color/blue_primary"/>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Кнопка сохранения -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnSaveSettings"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Сохранить все настройки"
+            android:textSize="16sp"
+            app:icon="@drawable/ic_save"
+            app:iconGravity="textStart"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="20dp"
+            style="@style/Widget.MaterialComponents.Button"/>
 
     </LinearLayout>
 </ScrollView>

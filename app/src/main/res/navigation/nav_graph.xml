@@ -7,12 +7,25 @@
 
     <fragment
         android:id="@+id/mainFragment"
-        android:name="com.example.meteonode.MainFragment"
+        android:name="com.example.meteonode.ui.fragments.MainFragment"
         android:label="Главная"
         tools:layout="@layout/fragment_main">
+
         <action
             android:id="@+id/action_mainFragment_to_connectionFragment"
             app:destination="@id/connectionFragment" />
+        <!-- Убрали все анимации -->
+
+        <action
+            android:id="@+id/action_mainFragment_to_statisticsFragment"
+            app:destination="@id/statisticsFragment" />
+        <!-- Убрали все анимации -->
+
+        <action
+            android:id="@+id/action_mainFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment" />
+        <!-- Убрали все анимации -->
+
     </fragment>
 
     <fragment
@@ -24,8 +37,8 @@
     <fragment
         android:id="@+id/statisticsFragment"
         android:name="com.example.meteonode.ui.fragments.StatisticsFragment"
-    android:label="Статистика"
-    tools:layout="@layout/fragment_statistics" />
+        android:label="Статистика"
+        tools:layout="@layout/fragment_statistics" />
 
     <fragment
         android:id="@+id/settingsFragment"
