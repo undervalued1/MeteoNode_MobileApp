@@ -2,4 +2,15 @@
     <string name="app_name">MeteoNode</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="searching_for_meteonode">Поиск сети MeteoNode-Setup...</string>
+    <string name="found_network">Найдена: %s\nПодключаемся...</string>
+    <string name="meteonode_not_found">Метеостанция не найдена.\nВключите устройство.</string>
+    <string name="connecting_to">Подключаемся к %s...</string>
+    <string name="connected_to">✅ Подключено к %s</string>
+    <string name="connection_failed">Не удалось подключиться</string>
+    <string name="failed_to_add_network">Не удалось добавить сеть</string>
+    <string name="searching_station_in_network">Поиск метеостанции в сети...</string>
+    <string name="successfully_connected">Успешно подключено!</string>
+    <string name="location_permission_required">Нужно разрешение на локацию для Wi-Fi</string>
+    <string name="bluetooth_in_development">Bluetooth подключение в разработке</string>
 </resources>

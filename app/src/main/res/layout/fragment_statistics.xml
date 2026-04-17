@@ -1,467 +1,472 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@color/background_default"
-    android:padding="16dp">
-
-    <!-- Заголовок -->
-    <com.google.android.material.card.MaterialCardView
-        android:layout_width="match_parent"
-        android:id="@+id/cardHeader"
-        android:layout_height="wrap_content"
-        app:cardCornerRadius="16dp"
-        android:layout_marginBottom="16dp"
-        app:cardBackgroundColor="@color/blue_primary">
-
+    android:fillViewport="true"
+    android:background="@color/background_default">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:gravity="center"
-            android:padding="20dp">
+            android:padding="16dp">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Статистика"
-                android:textSize="28sp"
-                android:textStyle="bold"
-                android:textColor="@color/white"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Анализ показателей"
-                android:textSize="14sp"
-                android:textColor="@color/white"
-                android:alpha="0.9"/>
-
-        </LinearLayout>
-    </com.google.android.material.card.MaterialCardView>
-
-    <!-- Периоды (улучшенный дизайн) -->
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/cardFilters"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:cardCornerRadius="12dp"
-        android:layout_marginBottom="16dp"
-        app:cardBackgroundColor="@color/card_background_default"
-        app:strokeColor="@color/blue_light"
-        app:strokeWidth="1dp">
-
-        <LinearLayout
+        <!-- Заголовок -->
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
+            android:id="@+id/cardHeader"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="12dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="ВЫБЕРИТЕ ПЕРИОД"
-                android:textSize="12sp"
-                android:textStyle="bold"
-                android:textColor="@color/blue_dark"
-                android:layout_marginBottom="8dp"
-                android:layout_marginStart="4dp"/>
+            app:cardCornerRadius="16dp"
+            android:layout_marginBottom="16dp"
+            app:cardBackgroundColor="@color/blue_primary">
 
             <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center">
-
-                <Button
-                    android:id="@+id/btnDay"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginEnd="4dp"
-                    android:text="День"
-                    android:textSize="12sp"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
-
-                <Button
-                    android:id="@+id/btnWeek"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginEnd="4dp"
-                    android:text="Неделя"
-                    android:textSize="12sp"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
-
-                <Button
-                    android:id="@+id/btnMonth"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginEnd="4dp"
-                    android:text="Месяц"
-                    android:textSize="12sp"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
-
-                <Button
-                    android:id="@+id/btnYear"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Год"
-                    android:textSize="12sp"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
-
-            </LinearLayout>
-
-        </LinearLayout>
-    </com.google.android.material.card.MaterialCardView>
-
-    <!-- Показатели (сворачиваемые) -->
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/cardIndicators"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:cardCornerRadius="12dp"
-        android:layout_marginBottom="16dp"
-        app:cardBackgroundColor="@color/card_background_default"
-        app:strokeColor="@color/blue_light"
-        app:strokeWidth="1dp">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="12dp">
-
-            <!-- Заголовок с кнопкой сворачивания -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="8dp">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="ПОКАЗАТЕЛИ"
-                    android:textSize="12sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/blue_dark"
-                    android:layout_marginStart="4dp"/>
-
-                <ImageButton
-                    android:id="@+id/btnToggleIndicators"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:src="@drawable/ic_arrow_up"
-                    android:tint="@color/blue_primary"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:padding="8dp"
-                    android:rotation="0"/>
-
-            </LinearLayout>
-
-            <!-- Контейнер с чекбоксами (сворачиваемый) -->
-            <LinearLayout
-                android:id="@+id/indicatorsContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:visibility="visible">
+                android:gravity="center"
+                android:padding="20dp">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
+                <TextView
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginBottom="4dp">
+                    android:text="Статистика"
+                    android:textSize="28sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/white"/>
 
-                    <CheckBox
-                        android:id="@+id/chkTemperature"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Температура"
-                        android:textColor="@color/text_primary_default"
-                        android:textSize="12sp"
-                        android:checked="true"/>
-
-                    <CheckBox
-                        android:id="@+id/chkHumidity"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Влажность"
-                        android:textColor="@color/text_primary_default"
-                        android:textSize="12sp"
-                        android:checked="true"/>
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
+                <TextView
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginBottom="4dp">
-
-                    <CheckBox
-                        android:id="@+id/chkPressure"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Давление"
-                        android:textColor="@color/text_primary_default"
-                        android:textSize="12sp"
-                        android:checked="true"/>
-
-                    <CheckBox
-                        android:id="@+id/chkAQI"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="AQI"
-                        android:textColor="@color/text_primary_default"
-                        android:textSize="12sp"
-                        android:checked="true"/>
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <CheckBox
-                        android:id="@+id/chkTVOC"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="TVOC"
-                        android:textColor="@color/text_primary_default"
-                        android:textSize="12sp"
-                        android:checked="true"/>
-
-                    <CheckBox
-                        android:id="@+id/chkCO2"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="CO₂"
-                        android:textColor="@color/text_primary_default"
-                        android:textSize="12sp"
-                        android:checked="true"/>
-
-                </LinearLayout>
+                    android:text="Анализ показателей"
+                    android:textSize="14sp"
+                    android:textColor="@color/white"
+                    android:alpha="0.9"/>
 
             </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
 
-        </LinearLayout>
-    </com.google.android.material.card.MaterialCardView>
-    <!-- График -->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="ГРАФИК ИЗМЕНЕНИЙ"
-        android:textSize="12sp"
-        android:textStyle="bold"
-        android:textColor="@color/blue_dark"
-        android:layout_marginBottom="4dp"
-        android:layout_marginStart="4dp"/>
-
-    <com.google.android.material.card.MaterialCardView
-        android:layout_width="match_parent"
-        android:layout_height="250dp"
-        app:cardCornerRadius="12dp"
-        android:layout_marginBottom="8dp"
-        app:cardBackgroundColor="@color/card_background_default"
-        app:strokeColor="@color/blue_light"
-        app:strokeWidth="1dp">
-
-        <com.github.mikephil.charting.charts.LineChart
-            android:id="@+id/lineChart"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:padding="4dp"/>
-
-    </com.google.android.material.card.MaterialCardView>
-
-    <!-- Легенда-->
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/cardLegend"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:cardCornerRadius="8dp"
-        android:layout_marginBottom="8dp"
-        app:cardBackgroundColor="@color/card_background_default"
-        android:padding="8dp">
-
-        <LinearLayout
+        <!-- Периоды (улучшенный дизайн) -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardFilters"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            app:cardCornerRadius="12dp"
+            android:layout_marginBottom="16dp"
+            app:cardBackgroundColor="@color/card_background_default"
+            app:strokeColor="@color/blue_light"
+            app:strokeWidth="1dp">
 
-            <!-- Первая строка -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center"
-                android:layout_marginBottom="8dp">
+                android:orientation="vertical"
+                android:padding="12dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="ВЫБЕРИТЕ ПЕРИОД"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/blue_dark"
+                    android:layout_marginBottom="8dp"
+                    android:layout_marginStart="4dp"/>
 
                 <LinearLayout
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
                     android:orientation="horizontal"
                     android:gravity="center">
 
-                    <View
-                        android:layout_width="12dp"
-                        android:layout_height="4dp"
-                        android:background="@color/chart_temperature"
-                        android:layout_marginEnd="4dp"/>
-
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <Button
+                        android:id="@+id/btnDay"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:text="Температура"
-                        android:textSize="9sp"
-                        android:textColor="@color/text_secondary_default"
-                        android:lines="1"/>
+                        android:layout_weight="1"
+                        android:layout_marginEnd="4dp"
+                        android:text="День"
+                        android:textSize="12sp"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
 
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="horizontal"
-                    android:gravity="center">
-
-                    <View
-                        android:layout_width="12dp"
-                        android:layout_height="4dp"
-                        android:background="@color/chart_humidity"
-                        android:layout_marginEnd="4dp"/>
-
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <Button
+                        android:id="@+id/btnWeek"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:text="Влажность"
-                        android:textSize="9sp"
-                        android:textColor="@color/text_secondary_default"
-                        android:lines="1"/>
+                        android:layout_weight="1"
+                        android:layout_marginEnd="4dp"
+                        android:text="Неделя"
+                        android:textSize="12sp"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
 
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="horizontal"
-                    android:gravity="center">
-
-                    <View
-                        android:layout_width="12dp"
-                        android:layout_height="4dp"
-                        android:background="@color/chart_pressure"
-                        android:layout_marginEnd="4dp"/>
-
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <Button
+                        android:id="@+id/btnMonth"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:text="Давление"
-                        android:textSize="9sp"
-                        android:textColor="@color/text_secondary_default"
-                        android:lines="1"/>
+                        android:layout_weight="1"
+                        android:layout_marginEnd="4dp"
+                        android:text="Месяц"
+                        android:textSize="12sp"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+
+                    <Button
+                        android:id="@+id/btnYear"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Год"
+                        android:textSize="12sp"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
 
                 </LinearLayout>
 
             </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
 
-            <!-- Вторая строка -->
+        <!-- Показатели (сворачиваемые) -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardIndicators"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="12dp"
+            android:layout_marginBottom="16dp"
+            app:cardBackgroundColor="@color/card_background_default"
+            app:strokeColor="@color/blue_light"
+            app:strokeWidth="1dp">
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center">
+                android:orientation="vertical"
+                android:padding="12dp">
 
+                <!-- Заголовок с кнопкой сворачивания -->
                 <LinearLayout
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
                     android:orientation="horizontal"
-                    android:gravity="center">
-
-                    <View
-                        android:layout_width="12dp"
-                        android:layout_height="4dp"
-                        android:background="@color/chart_aqi"
-                        android:layout_marginEnd="4dp"/>
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="8dp">
 
                     <TextView
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:text="AQI"
-                        android:textSize="9sp"
-                        android:textColor="@color/text_secondary_default"
-                        android:lines="1"/>
+                        android:layout_weight="1"
+                        android:text="ПОКАЗАТЕЛИ"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/blue_dark"
+                        android:layout_marginStart="4dp"/>
+
+                    <ImageButton
+                        android:id="@+id/btnToggleIndicators"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:src="@drawable/ic_arrow_up"
+                        android:tint="@color/blue_primary"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:padding="8dp"
+                        android:rotation="0"/>
 
                 </LinearLayout>
 
+                <!-- Контейнер с чекбоксами (сворачиваемый) -->
                 <LinearLayout
-                    android:layout_width="0dp"
+                    android:id="@+id/indicatorsContainer"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="horizontal"
-                    android:gravity="center">
+                    android:orientation="vertical"
+                    android:visibility="visible">
 
-                    <View
-                        android:layout_width="12dp"
-                        android:layout_height="4dp"
-                        android:background="@color/chart_tvoc"
-                        android:layout_marginEnd="4dp"/>
-
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="TVOC"
-                        android:textSize="9sp"
-                        android:textColor="@color/text_secondary_default"
-                        android:lines="1"/>
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="4dp">
 
-                </LinearLayout>
+                        <CheckBox
+                            android:id="@+id/chkTemperature"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Температура"
+                            android:textColor="@color/text_primary_default"
+                            android:textSize="12sp"
+                            android:checked="true"/>
 
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="horizontal"
-                    android:gravity="center">
+                        <CheckBox
+                            android:id="@+id/chkHumidity"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Влажность"
+                            android:textColor="@color/text_primary_default"
+                            android:textSize="12sp"
+                            android:checked="true"/>
 
-                    <View
-                        android:layout_width="12dp"
-                        android:layout_height="4dp"
-                        android:background="@color/chart_co2"
-                        android:layout_marginEnd="4dp"/>
+                    </LinearLayout>
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="CO₂"
-                        android:textSize="9sp"
-                        android:textColor="@color/text_secondary_default"
-                        android:lines="1"/>
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="4dp">
+
+                        <CheckBox
+                            android:id="@+id/chkPressure"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Давление"
+                            android:textColor="@color/text_primary_default"
+                            android:textSize="12sp"
+                            android:checked="true"/>
+
+                        <CheckBox
+                            android:id="@+id/chkAQI"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="AQI"
+                            android:textColor="@color/text_primary_default"
+                            android:textSize="12sp"
+                            android:checked="true"/>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <CheckBox
+                            android:id="@+id/chkTVOC"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="TVOC"
+                            android:textColor="@color/text_primary_default"
+                            android:textSize="12sp"
+                            android:checked="true"/>
+
+                        <CheckBox
+                            android:id="@+id/chkCO2"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="CO₂"
+                            android:textColor="@color/text_primary_default"
+                            android:textSize="12sp"
+                            android:checked="true"/>
+
+                    </LinearLayout>
 
                 </LinearLayout>
 
             </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+        <!-- График -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="ГРАФИК ИЗМЕНЕНИЙ"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:textColor="@color/blue_dark"
+            android:layout_marginBottom="4dp"
+            android:layout_marginStart="4dp"/>
 
-        </LinearLayout>
-    </com.google.android.material.card.MaterialCardView>
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="250dp"
+            app:cardCornerRadius="12dp"
+            android:layout_marginBottom="8dp"
+            app:cardBackgroundColor="@color/card_background_default"
+            app:strokeColor="@color/blue_light"
+            app:strokeWidth="1dp">
 
-</LinearLayout>
+            <com.github.mikephil.charting.charts.LineChart
+                android:id="@+id/lineChart"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="4dp"/>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Легенда-->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardLegend"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="8dp"
+            android:layout_marginBottom="8dp"
+            app:cardBackgroundColor="@color/card_background_default"
+            android:padding="8dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <!-- Первая строка -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:layout_marginBottom="8dp">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="horizontal"
+                        android:gravity="center">
+
+                        <View
+                            android:layout_width="12dp"
+                            android:layout_height="4dp"
+                            android:background="@color/chart_temperature"
+                            android:layout_marginEnd="4dp"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Температура"
+                            android:textSize="9sp"
+                            android:textColor="@color/text_secondary_default"
+                            android:lines="1"/>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="horizontal"
+                        android:gravity="center">
+
+                        <View
+                            android:layout_width="12dp"
+                            android:layout_height="4dp"
+                            android:background="@color/chart_humidity"
+                            android:layout_marginEnd="4dp"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Влажность"
+                            android:textSize="9sp"
+                            android:textColor="@color/text_secondary_default"
+                            android:lines="1"/>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="horizontal"
+                        android:gravity="center">
+
+                        <View
+                            android:layout_width="12dp"
+                            android:layout_height="4dp"
+                            android:background="@color/chart_pressure"
+                            android:layout_marginEnd="4dp"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Давление"
+                            android:textSize="9sp"
+                            android:textColor="@color/text_secondary_default"
+                            android:lines="1"/>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <!-- Вторая строка -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="horizontal"
+                        android:gravity="center">
+
+                        <View
+                            android:layout_width="12dp"
+                            android:layout_height="4dp"
+                            android:background="@color/chart_aqi"
+                            android:layout_marginEnd="4dp"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="AQI"
+                            android:textSize="9sp"
+                            android:textColor="@color/text_secondary_default"
+                            android:lines="1"/>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="horizontal"
+                        android:gravity="center">
+
+                        <View
+                            android:layout_width="12dp"
+                            android:layout_height="4dp"
+                            android:background="@color/chart_tvoc"
+                            android:layout_marginEnd="4dp"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="TVOC"
+                            android:textSize="9sp"
+                            android:textColor="@color/text_secondary_default"
+                            android:lines="1"/>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="horizontal"
+                        android:gravity="center">
+
+                        <View
+                            android:layout_width="12dp"
+                            android:layout_height="4dp"
+                            android:background="@color/chart_co2"
+                            android:layout_marginEnd="4dp"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="CO₂"
+                            android:textSize="9sp"
+                            android:textColor="@color/text_secondary_default"
+                            android:lines="1"/>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

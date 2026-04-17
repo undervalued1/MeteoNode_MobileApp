@@ -1,10 +1,11 @@
 package com.example.meteonode.ui.fragments
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.os.Handler
+import android.os.Looper
+import android.view.*
 import android.widget.FrameLayout
+import androidx.core.content.ContextCompat
 import androidx.navigation.fragment.findNavController
 import com.example.meteonode.R
 import com.example.meteonode.databinding.FragmentMainBinding
@@ -14,11 +15,16 @@ class MainFragment : BaseFragment() {
     private var _binding: FragmentMainBinding? = null
     private val binding get() = _binding!!
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
+    private val handler = Handler(Looper.getMainLooper())
+
+    private val updateRunnable = object : Runnable {
+        override fun run() {
+            loadData()
+            handler.postDelayed(this, 3000) // каждые 3 секунды
+        }
+    }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentMainBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -27,102 +33,100 @@ class MainFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setupClickListeners()
-        updateSensorData()
-
-        // Ждем отрисовки для позиционирования индикатора
-        view.post {
-            updateAirQualityLevel(2) // Тестовый уровень 2
-        }
+        handler.post(updateRunnable)
     }
 
     private fun setupClickListeners() {
         binding.connectionCard.setOnClickListener {
             animateClick(binding.connectionCard)
-
             findNavController().navigate(R.id.action_mainFragment_to_connectionFragment)
         }
 
         binding.btnQuickConnect.setOnClickListener {
             animateClick(binding.btnQuickConnect)
-
             findNavController().navigate(R.id.action_mainFragment_to_connectionFragment)
         }
     }
 
-    private fun updateSensorData() {
-        // Температура
-        binding.tvTemperature.text = "22.5°"
+    private fun loadData() {
+        Thread {
+            val data = DeviceRepository.getData()
 
-        // Влажность
-        binding.tvHumidity.text = "45%"
+            requireActivity().runOnUiThread {
+                if (data != null) {
+                    updateUI(data)
+                    updateConnectionStatus(true)
+                } else {
+                    updateConnectionStatus(false)
+                    // Показываем последние известные значения или "--"
+                    showNoDataPlaceholders()
+                }
+            }
+        }.start()
+    }
 
-        // Давление
-        binding.tvPressure.text = "760"
+    private fun updateConnectionStatus(connected: Boolean) {
+        val statusText = if (connected) {
+            "✅ Устройство подключено"
+        } else {
+            "❌ Устройство не подключено"
+        }
 
-        // CO2 и TVOC
-        binding.tvCo2.text = "450 ppm"
-        binding.tvTvoc.text = "120 ppb"
+        val statusColor = if (connected) {
+            ContextCompat.getColor(requireContext(), R.color.level_2)
+        } else {
+            ContextCompat.getColor(requireContext(), R.color.gray_dark)
+        }
 
-        // Качество воздуха (пример: уровень 2 из 5)
-        val airQualityLevel = 2
-        updateAirQualityLevel(airQualityLevel)
+        binding.tvConnectionStatus.text = statusText
+        binding.tvConnectionStatus.setTextColor(statusColor)
+    }
+
+    private fun showNoDataPlaceholders() {
+        binding.tvTemperature.text = "--°"
+        binding.tvHumidity.text = "--%"
+        binding.tvPressure.text = "--"
+        binding.tvCo2.text = "-- ppm"
+        binding.tvTvoc.text = "-- ppb"
+        binding.tvAqiDescription.text = "Нет данных"
+    }
+
+    private fun updateUI(data: com.example.meteonode.ui.fragments.SensorData) {
+        binding.tvTemperature.text = "${data.temperature}°"
+        binding.tvHumidity.text = "${data.humidity}%"
+        binding.tvPressure.text = "${data.pressure}"
+
+        binding.tvCo2.text = "${data.co2} ppm"
+        binding.tvTvoc.text = "${data.tvoc} ppb"
+
+        updateAirQualityLevel(data.aqi)
     }
 
     private fun updateAirQualityLevel(level: Int) {
         val scaleWidth = binding.scaleBackground.width
         val indicator = binding.scaleIndicator
 
-        // Показываем индикатор
         indicator.visibility = View.VISIBLE
 
-        // Рассчитываем позицию (от 0 до 1)
-        val position = (level - 1) / 4.0f
+        val position = (level - 1) / 4f
 
-        // Устанавливаем позицию индикатора
         val params = indicator.layoutParams as FrameLayout.LayoutParams
         val marginStart = (scaleWidth * position) - (indicator.width / 2)
         params.marginStart = marginStart.toInt()
         indicator.layoutParams = params
 
-        // Анимируем появление индикатора
-        indicator.scaleX = 0f
-        indicator.scaleY = 0f
-        indicator.animate()
-            .scaleX(1f)
-            .scaleY(1f)
-            .setDuration(300)
-            .start()
-
-        // Обновляем тексты и цвета
         when (level) {
-            1 -> {
-                binding.tvAqiDescription.text = "Качество воздуха идеальное"
-                binding.tvAqiDescription.setTextColor(resources.getColor(R.color.level_1, null))
-                animatePulse(binding.tvAqiDescription)
-            }
-            2 -> {
-                binding.tvAqiDescription.text = "Качество воздуха хорошее"
-                binding.tvAqiDescription.setTextColor(resources.getColor(R.color.level_2, null))
-            }
-            3 -> {
-                binding.tvAqiDescription.text = "Качество воздуха удовлетворительное"
-                binding.tvAqiDescription.setTextColor(resources.getColor(R.color.level_3, null))
-            }
-            4 -> {
-
-                binding.tvAqiDescription.text = "Качество воздуха плохое, проветрите помещение"
-                binding.tvAqiDescription.setTextColor(resources.getColor(R.color.level_4, null))
-            }
-            5 -> {
-
-                binding.tvAqiDescription.text = "Опасно для жизни! Покиньте помещение"
-                binding.tvAqiDescription.setTextColor(resources.getColor(R.color.level_5, null))
-            }
+            1 -> binding.tvAqiDescription.text = "Идеально"
+            2 -> binding.tvAqiDescription.text = "Хорошо"
+            3 -> binding.tvAqiDescription.text = "Средне"
+            4 -> binding.tvAqiDescription.text = "Плохо"
+            5 -> binding.tvAqiDescription.text = "Опасно"
         }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
+        handler.removeCallbacks(updateRunnable)
         _binding = null
     }
 }

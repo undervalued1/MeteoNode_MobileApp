@@ -42,7 +42,7 @@ class StatisticsFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setupChart()
-        generateDemoData()
+        startLiveData()
         setupListeners()
         updateChart()
         animateViews()
@@ -120,30 +120,35 @@ class StatisticsFragment : BaseFragment() {
         chart.setDrawMarkerViews(true)
     }
 
-    private fun generateDemoData() {
-        val calendar = Calendar.getInstance()
-        val random = Random()
+    private fun startLiveData() {
+        Thread {
+            while (true) {
+                val data = DeviceRepository.getData()
 
-        for (i in 0..60) {
-            val timestamp = calendar.timeInMillis
-            calendar.add(Calendar.DAY_OF_YEAR, -1)
+                if (data != null && DeviceRepository.isConnected) {
+                    val item = StatisticsData(
+                        System.currentTimeMillis(),
+                        data.temperature,
+                        data.humidity,
+                        data.pressure,
+                        data.aqi,
+                        data.tvoc,
+                        data.co2
+                    )
 
-            val dayFactor = i / 30.0f
-            val waveFactor = Math.sin(i * 0.3).toFloat()
+                    requireActivity().runOnUiThread {
+                        allData.add(item)
+                        // Ограничиваем размер для производительности
+                        if (allData.size > 1000) {
+                            allData.removeAt(0)
+                        }
+                        updateChart()
+                    }
+                }
 
-            val temperature = 22f + waveFactor * 3 + dayFactor * 0.3f + random.nextFloat()
-            val humidity = 50f + waveFactor * 10 - dayFactor * 0.5f + random.nextFloat()
-            val pressure = 755f + waveFactor * 5 + random.nextFloat()
-            val aqi = (3 + (waveFactor * 1.5).toInt()).coerceIn(1, 5)
-            val tvoc = 100f + waveFactor * 30 + random.nextFloat() * 10
-            val co2 = 400f + waveFactor * 100 + random.nextFloat() * 20
-
-            allData.add(StatisticsData(
-                timestamp, temperature, humidity, pressure, aqi, tvoc, co2
-            ))
-        }
-
-        allData.sortBy { it.timestamp }
+                Thread.sleep(5000)
+            }
+        }.start()
     }
 
     private fun setupListeners() {
