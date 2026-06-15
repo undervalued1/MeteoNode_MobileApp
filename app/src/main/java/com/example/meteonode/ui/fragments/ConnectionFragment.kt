@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import com.example.meteonode.DeviceRepository
 import com.example.meteonode.databinding.FragmentConnectionBinding
 import com.google.android.material.snackbar.Snackbar
 import java.net.HttpURLConnection
@@ -20,6 +21,9 @@ class ConnectionFragment : Fragment() {
     private val binding get() = _binding!!
 
     private lateinit var wifiManager: WifiManager
+
+    private var scanThread: Thread? = null
+    private var isScanning = true
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -41,8 +45,6 @@ class ConnectionFragment : Fragment() {
         checkPermissions()
     }
 
-    // ================= UI =================
-
     private fun setupClickListeners() {
         binding.cardWifi.setOnClickListener {
             animateClick(binding.cardWifi)
@@ -62,95 +64,85 @@ class ConnectionFragment : Fragment() {
         val currentSsid = wifiManager.connectionInfo.ssid?.replace("\"", "") ?: ""
 
         if (currentSsid.isNotBlank() && currentSsid != "<unknown ssid>") {
-            binding.tvConnectionStatus.text =
-                "Подключены к: $currentSsid\nИщем метеостанцию..."
+            binding.tvConnectionStatus.text = "Подключены к: $currentSsid\nИщем метеостанцию..."
             searchMeteoStationAutomatically()
         } else {
             binding.tvConnectionStatus.text = "Сначала подключитесь к Wi-Fi"
         }
     }
 
-    // ================= NETWORK =================
-
-    // Получаем подсеть (например 192.168.0)
     private fun getSubnet(): String {
         val ipInt = wifiManager.connectionInfo.ipAddress
-
-        val ip = String.format(
-            "%d.%d.%d.%d",
+        return String.format(
+            "%d.%d.%d",
             ipInt and 0xff,
             ipInt shr 8 and 0xff,
-            ipInt shr 16 and 0xff,
-            ipInt shr 24 and 0xff
+            ipInt shr 16 and 0xff
         )
-
-        return ip.substringBeforeLast(".")
     }
 
     private fun searchMeteoStationAutomatically() {
-        binding.tvConnectionStatus.text = "Сканируем сеть..."
+        isScanning = true
+        scanThread = Thread {
+            val subnet = getSubnet()
 
-        val subnet = getSubnet()
-
-        Thread {
             for (i in 1..254) {
+                if (!isScanning) break
+
                 val ip = "$subnet.$i"
 
                 try {
-                    val url = URL("http://$ip/data")  // Проверяем именно /data
+                    val url = URL("http://$ip/data")
                     val conn = url.openConnection() as HttpURLConnection
 
-                    conn.connectTimeout = 500
-                    conn.readTimeout = 500
+                    conn.connectTimeout = 400
+                    conn.readTimeout = 400
                     conn.requestMethod = "GET"
 
-                    val responseCode = conn.responseCode
-
-                    if (responseCode == HttpURLConnection.HTTP_OK) {
-                        // Проверяем, что ответ содержит JSON с датчиками
+                    if (conn.responseCode == HttpURLConnection.HTTP_OK) {
                         val response = conn.inputStream.bufferedReader().use { it.readText() }
-                        if (response.contains("temperature")) {
-                            requireActivity().runOnUiThread {
-                                binding.tvConnectionStatus.text = "✅ Найдена метеостанция!\nIP: $ip"
-                                DeviceRepository.deviceIp = ip
+                        if (response.contains("temperature") || response.contains("humidity")) {
 
-                                Snackbar.make(
-                                    binding.root,
-                                    "Метеостанция подключена!",
-                                    Snackbar.LENGTH_LONG
-                                ).show()
+                            activity?.runOnUiThread {
+                                if (isAdded && _binding != null) {
+                                    binding.tvConnectionStatus.text = "✅ Метеостанция найдена!\nIP: $ip"
 
-                                // Возвращаемся на главный экран
-                                parentFragmentManager?.popBackStack()
+                                    DeviceRepository.deviceIp = ip   // ← ИСПРАВЛЕНО
+
+                                    Snackbar.make(binding.root, "Метеостанция успешно подключена!", Snackbar.LENGTH_LONG).show()
+
+                                    parentFragmentManager.popBackStack()
+                                }
                             }
                             return@Thread
                         }
                     }
-
                 } catch (_: Exception) {
-                    // игнорируем ошибки
+                    // игнорируем
                 }
 
                 if (i % 20 == 0) {
-                    requireActivity().runOnUiThread {
-                        binding.tvConnectionStatus.text = "Сканирование: $subnet.$i"
+                    activity?.runOnUiThread {
+                        if (isAdded && _binding != null) {
+                            binding.tvConnectionStatus.text = "Сканирование: $subnet.$i / 254"
+                        }
                     }
                 }
+
+                Thread.sleep(10)
             }
 
-            requireActivity().runOnUiThread {
-                binding.tvConnectionStatus.text = "❌ Устройство не найдено\nУбедитесь, что:\n1. ESP32 подключен к той же сети\n2. ESP32 получает питание"
+            activity?.runOnUiThread {
+                if (isAdded && _binding != null) {
+                    binding.tvConnectionStatus.text = "❌ Метеостанция не найдена\nПроверьте подключение ESP32"
+                }
             }
-        }.start()
+        }.apply { start() }
     }
 
-    // ================= PERMISSIONS =================
-
     private fun checkPermissions() {
-        if (ContextCompat.checkSelfPermission(
-                requireContext(),
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+            != PackageManager.PERMISSION_GRANTED
         ) {
             requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1001)
         }
@@ -161,24 +153,22 @@ class ConnectionFragment : Fragment() {
         permissions: Array<out String>,
         grantResults: IntArray
     ) {
-        if (requestCode == 1001 &&
-            grantResults.isNotEmpty() &&
-            grantResults[0] == PackageManager.PERMISSION_GRANTED
-        ) {
+        if (requestCode == 1001 && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             startConnectionProcess()
         }
     }
 
-    // ================= UI HELPERS =================
-
     private fun animateClick(view: View) {
-        view.animate().scaleX(0.95f).scaleY(0.95f).setDuration(100).withEndAction {
-            view.animate().scaleX(1f).scaleY(1f).setDuration(100).start()
-        }
+        view.animate().scaleX(0.95f).scaleY(0.95f).setDuration(100)
+            .withEndAction { view.animate().scaleX(1f).scaleY(1f).setDuration(100).start() }
+            .start()
     }
 
     override fun onDestroyView() {
-        super.onDestroyView()
+        isScanning = false
+        scanThread?.interrupt()
+        scanThread = null
         _binding = null
+        super.onDestroyView()
     }
 }

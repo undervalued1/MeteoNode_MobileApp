@@ -3,10 +3,13 @@ package com.example.meteonode.ui.fragments
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.core.content.ContextCompat
 import androidx.navigation.fragment.findNavController
+import com.example.meteonode.DeviceRepository
 import com.example.meteonode.R
 import com.example.meteonode.databinding.FragmentMainBinding
 
@@ -19,12 +22,18 @@ class MainFragment : BaseFragment() {
 
     private val updateRunnable = object : Runnable {
         override fun run() {
-            loadData()
-            handler.postDelayed(this, 3000) // каждые 3 секунды
+            if (isAdded && _binding != null) {
+                loadData()
+            }
+            handler.postDelayed(this, 3000)
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         _binding = FragmentMainBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -52,24 +61,29 @@ class MainFragment : BaseFragment() {
         Thread {
             val data = DeviceRepository.getData()
 
+            if (!isAdded || _binding == null) return@Thread
+
             requireActivity().runOnUiThread {
-                if (data != null) {
-                    updateUI(data)
-                    updateConnectionStatus(true)
-                } else {
-                    updateConnectionStatus(false)
-                    // Показываем последние известные значения или "--"
-                    showNoDataPlaceholders()
+                if (isAdded && _binding != null) {
+                    if (data != null) {
+                        updateUI(data)
+                        updateConnectionStatus(true)
+                    } else {
+                        updateConnectionStatus(false)
+                        showNoDataPlaceholders()
+                    }
                 }
             }
         }.start()
     }
 
     private fun updateConnectionStatus(connected: Boolean) {
+        if (!isAdded || _binding == null) return
+
         val statusText = if (connected) {
-            "✅ Устройство подключено"
+            "✅ Устройство подключено (${DeviceRepository.deviceIp})"
         } else {
-            "❌ Устройство не подключено"
+            "❌ Нет связи с устройством"
         }
 
         val statusColor = if (connected) {
@@ -83,6 +97,8 @@ class MainFragment : BaseFragment() {
     }
 
     private fun showNoDataPlaceholders() {
+        if (!isAdded || _binding == null) return
+
         binding.tvTemperature.text = "--°"
         binding.tvHumidity.text = "--%"
         binding.tvPressure.text = "--"
@@ -91,7 +107,9 @@ class MainFragment : BaseFragment() {
         binding.tvAqiDescription.text = "Нет данных"
     }
 
-    private fun updateUI(data: com.example.meteonode.ui.fragments.SensorData) {
+    private fun updateUI(data: SensorData) {
+        if (!isAdded || _binding == null) return
+
         binding.tvTemperature.text = "${data.temperature}°"
         binding.tvHumidity.text = "${data.humidity}%"
         binding.tvPressure.text = "${data.pressure}"
@@ -103,30 +121,44 @@ class MainFragment : BaseFragment() {
     }
 
     private fun updateAirQualityLevel(level: Int) {
+        if (!isAdded || _binding == null) return
+
         val scaleWidth = binding.scaleBackground.width
         val indicator = binding.scaleIndicator
 
         indicator.visibility = View.VISIBLE
 
         val position = (level - 1) / 4f
-
         val params = indicator.layoutParams as FrameLayout.LayoutParams
         val marginStart = (scaleWidth * position) - (indicator.width / 2)
         params.marginStart = marginStart.toInt()
         indicator.layoutParams = params
 
-        when (level) {
-            1 -> binding.tvAqiDescription.text = "Идеально"
-            2 -> binding.tvAqiDescription.text = "Хорошо"
-            3 -> binding.tvAqiDescription.text = "Средне"
-            4 -> binding.tvAqiDescription.text = "Плохо"
-            5 -> binding.tvAqiDescription.text = "Опасно"
+        binding.tvAqiDescription.text = when (level) {
+            1 -> "Идеально"
+            2 -> "Хорошо"
+            3 -> "Средне"
+            4 -> "Плохо"
+            5 -> "Опасно"
+            else -> "Неизвестно"
         }
     }
 
+
+    override fun animateClick(view: View) {
+        view.animate()
+            .scaleX(0.95f)
+            .scaleY(0.95f)
+            .setDuration(100)
+            .withEndAction {
+                view.animate().scaleX(1f).scaleY(1f).setDuration(100).start()
+            }
+            .start()
+    }
+
     override fun onDestroyView() {
-        super.onDestroyView()
         handler.removeCallbacks(updateRunnable)
         _binding = null
+        super.onDestroyView()
     }
 }

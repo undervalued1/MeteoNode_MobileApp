@@ -53,7 +53,7 @@ open class BaseFragment : Fragment() {
         return cards
     }
 
-    protected fun animateClick(view: View) {
+    open fun animateClick(view: View) {
         view.animate()
             .scaleX(0.95f)
             .scaleY(0.95f)
