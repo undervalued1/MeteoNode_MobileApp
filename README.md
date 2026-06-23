@@ -38,6 +38,7 @@
 
 ```bash
 git clone https://github.com/undervalued1/MeteoNode_MobileApp.git
+```
 
 ---
 
