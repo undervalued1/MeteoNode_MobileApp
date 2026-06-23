@@ -110,9 +110,9 @@ class MainFragment : BaseFragment() {
     private fun updateUI(data: SensorData) {
         if (!isAdded || _binding == null) return
 
-        binding.tvTemperature.text = "${data.temperature}°"
-        binding.tvHumidity.text = "${data.humidity}%"
-        binding.tvPressure.text = "${data.pressure}"
+        binding.tvTemperature.text = "${String.format("%.1f", data.temperature)}°"
+        binding.tvHumidity.text = "${String.format("%.0f", data.humidity)}%"  // Без десятичных
+        binding.tvPressure.text = "${String.format("%.0f", data.pressure)}"   // Без десятичных
 
         binding.tvCo2.text = "${data.co2} ppm"
         binding.tvTvoc.text = "${data.tvoc} ppb"
@@ -156,9 +156,26 @@ class MainFragment : BaseFragment() {
             .start()
     }
 
+    override fun onResume() {
+        super.onResume()
+        restoreConnection()
+    }
+
+    private fun restoreConnection() {
+        val savedIp = requireContext()
+            .getSharedPreferences("meteonode", android.content.Context.MODE_PRIVATE)
+            .getString("device_ip", null)
+
+        if (savedIp != null && savedIp != "192.168.4.1") {
+            DeviceRepository.deviceIp = savedIp
+        }
+    }
+
     override fun onDestroyView() {
         handler.removeCallbacks(updateRunnable)
         _binding = null
         super.onDestroyView()
     }
 }
+
+

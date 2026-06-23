@@ -1,11 +1,15 @@
 package com.example.meteonode
 
+import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.example.meteonode.databinding.ActivityMainBinding
+import com.example.meteonode.ui.fragments.NotificationHelper
+import com.example.meteonode.ui.fragments.SensorMonitoringService
 
 class MainActivity : AppCompatActivity() {
 
@@ -22,7 +26,16 @@ class MainActivity : AppCompatActivity() {
             "system" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
         }
 
+        val serviceIntent = Intent(this, SensorMonitoringService::class.java)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(serviceIntent)
+        } else {
+            startService(serviceIntent)
+        }
+
         super.onCreate(savedInstanceState)
+
+        NotificationHelper.createChannel(this)
 
         // Анимация для активности
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)

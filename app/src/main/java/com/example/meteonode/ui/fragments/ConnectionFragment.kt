@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment
 import com.example.meteonode.DeviceRepository
 import com.example.meteonode.databinding.FragmentConnectionBinding
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.*
 import java.net.HttpURLConnection
 import java.net.URL
 
@@ -21,15 +22,9 @@ class ConnectionFragment : Fragment() {
     private val binding get() = _binding!!
 
     private lateinit var wifiManager: WifiManager
+    private var searchJob: Job? = null
 
-    private var scanThread: Thread? = null
-    private var isScanning = true
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentConnectionBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -37,9 +32,7 @@ class ConnectionFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        wifiManager = requireContext()
-            .applicationContext
-            .getSystemService(WifiManager::class.java)
+        wifiManager = requireContext().applicationContext.getSystemService(WifiManager::class.java)
 
         setupClickListeners()
         checkPermissions()
@@ -52,92 +45,144 @@ class ConnectionFragment : Fragment() {
         }
 
         binding.cardBluetooth.setOnClickListener {
-            animateClick(binding.cardBluetooth)
             Snackbar.make(binding.root, "Bluetooth в разработке", Snackbar.LENGTH_SHORT).show()
         }
     }
 
     private fun startConnectionProcess() {
         binding.cardStatus.visibility = View.VISIBLE
-        binding.tvConnectionStatus.text = "Проверяем Wi-Fi..."
+        binding.tvConnectionStatus.text = "Проверяем подключение..."
 
         val currentSsid = wifiManager.connectionInfo.ssid?.replace("\"", "") ?: ""
 
-        if (currentSsid.isNotBlank() && currentSsid != "<unknown ssid>") {
-            binding.tvConnectionStatus.text = "Подключены к: $currentSsid\nИщем метеостанцию..."
-            searchMeteoStationAutomatically()
-        } else {
-            binding.tvConnectionStatus.text = "Сначала подключитесь к Wi-Fi"
+        when {
+            currentSsid.contains("MeteoNode", ignoreCase = true) -> {
+                binding.tvConnectionStatus.text = "Подключены к точке доступа MeteoNode\nПроверяем 192.168.4.1..."
+                searchDirectlyAPMode()
+            }
+            currentSsid.isNotBlank() && currentSsid != "<unknown ssid>" -> {
+                binding.tvConnectionStatus.text = "Подключены к: $currentSsid\nИщем устройство в сети..."
+                searchInLocalNetwork()
+            }
+            else -> {
+                binding.tvConnectionStatus.text = "Сначала подключитесь к Wi-Fi"
+            }
+        }
+    }
+
+    private fun searchDirectlyAPMode() {
+        searchJob?.cancel()
+        searchJob = CoroutineScope(Dispatchers.IO).launch {
+            if (tryConnectToDevice("192.168.4.1")) {
+                onDeviceFound("192.168.4.1")
+            } else {
+                withContext(Dispatchers.Main) {
+                    binding.tvConnectionStatus.text = "❌ Не удалось подключиться к 192.168.4.1\nУбедитесь, что устройство включено"
+                }
+            }
+        }
+    }
+
+    private fun searchInLocalNetwork() {
+        searchJob?.cancel()
+        searchJob = CoroutineScope(Dispatchers.IO).launch {
+
+            // 1. Пробуем сохранённый IP
+            val savedIp = loadDeviceIp()
+            if (savedIp != null && savedIp != "192.168.4.1") {
+                withContext(Dispatchers.Main) {
+                    binding.tvConnectionStatus.text = "Проверяем сохранённый IP: $savedIp..."
+                }
+                if (tryConnectToDevice(savedIp)) {
+                    onDeviceFound(savedIp)
+                    return@launch
+                }
+            }
+
+            // 2. Пробуем mDNS
+            try {
+                withContext(Dispatchers.Main) {
+                    binding.tvConnectionStatus.text = "Ищем meteonode.local..."
+                }
+                if (tryConnectToDevice("meteonode.local")) {
+                    onDeviceFound("meteonode.local")
+                    return@launch
+                }
+            } catch (_: Exception) {}
+
+            // 3. Сканируем подсеть
+            val subnet = getSubnet()
+            withContext(Dispatchers.Main) {
+                binding.tvConnectionStatus.text = "Сканируем сеть $subnet.0/24..."
+            }
+
+            for (i in 1..254) {
+                if (!isActive) return@launch
+                val ip = "$subnet.$i"
+                if (tryConnectToDevice(ip)) {
+                    onDeviceFound(ip)
+                    return@launch
+                }
+            }
+
+            withContext(Dispatchers.Main) {
+                binding.tvConnectionStatus.text = "❌ Устройство не найдено в сети $subnet.0/24"
+            }
+        }
+    }
+
+    private suspend fun tryConnectToDevice(ip: String): Boolean {
+        return try {
+            val url = URL("http://$ip/ping")
+            val conn = url.openConnection() as HttpURLConnection
+            conn.connectTimeout = 1000  // Было 1500
+            conn.readTimeout = 1000     // Было 2000
+            conn.requestMethod = "GET"
+
+            val code = conn.responseCode
+            if (code == HttpURLConnection.HTTP_OK) {
+                val body = conn.inputStream.bufferedReader().use { it.readText() }
+                body.contains("pong")
+            } else false
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    private fun saveDeviceIp(ip: String) {
+        requireContext()
+            .getSharedPreferences("meteonode", android.content.Context.MODE_PRIVATE)
+            .edit()
+            .putString("device_ip", ip)
+            .apply()
+    }
+
+    private fun loadDeviceIp(): String? {
+        return requireContext()
+            .getSharedPreferences("meteonode", android.content.Context.MODE_PRIVATE)
+            .getString("device_ip", null)
+    }
+
+    private fun onDeviceFound(ip: String) {
+        CoroutineScope(Dispatchers.Main).launch {
+            // Всегда сохраняем IP как есть (для mDNS тоже сохраняем имя)
+            DeviceRepository.deviceIp = ip
+            saveDeviceIp(ip)
+
+            withContext(Dispatchers.IO) {
+                DeviceRepository.syncThresholdsToLocal(requireContext())
+            }
+
+            binding.tvConnectionStatus.text = "✅ Устройство найдено!\nIP: $ip"
+            Snackbar.make(binding.root, "Подключено успешно!", Snackbar.LENGTH_LONG).show()
+            delay(1000)
+            parentFragmentManager.popBackStack()
         }
     }
 
     private fun getSubnet(): String {
         val ipInt = wifiManager.connectionInfo.ipAddress
-        return String.format(
-            "%d.%d.%d",
-            ipInt and 0xff,
-            ipInt shr 8 and 0xff,
-            ipInt shr 16 and 0xff
-        )
-    }
-
-    private fun searchMeteoStationAutomatically() {
-        isScanning = true
-        scanThread = Thread {
-            val subnet = getSubnet()
-
-            for (i in 1..254) {
-                if (!isScanning) break
-
-                val ip = "$subnet.$i"
-
-                try {
-                    val url = URL("http://$ip/data")
-                    val conn = url.openConnection() as HttpURLConnection
-
-                    conn.connectTimeout = 400
-                    conn.readTimeout = 400
-                    conn.requestMethod = "GET"
-
-                    if (conn.responseCode == HttpURLConnection.HTTP_OK) {
-                        val response = conn.inputStream.bufferedReader().use { it.readText() }
-                        if (response.contains("temperature") || response.contains("humidity")) {
-
-                            activity?.runOnUiThread {
-                                if (isAdded && _binding != null) {
-                                    binding.tvConnectionStatus.text = "✅ Метеостанция найдена!\nIP: $ip"
-
-                                    DeviceRepository.deviceIp = ip   // ← ИСПРАВЛЕНО
-
-                                    Snackbar.make(binding.root, "Метеостанция успешно подключена!", Snackbar.LENGTH_LONG).show()
-
-                                    parentFragmentManager.popBackStack()
-                                }
-                            }
-                            return@Thread
-                        }
-                    }
-                } catch (_: Exception) {
-                    // игнорируем
-                }
-
-                if (i % 20 == 0) {
-                    activity?.runOnUiThread {
-                        if (isAdded && _binding != null) {
-                            binding.tvConnectionStatus.text = "Сканирование: $subnet.$i / 254"
-                        }
-                    }
-                }
-
-                Thread.sleep(10)
-            }
-
-            activity?.runOnUiThread {
-                if (isAdded && _binding != null) {
-                    binding.tvConnectionStatus.text = "❌ Метеостанция не найдена\nПроверьте подключение ESP32"
-                }
-            }
-        }.apply { start() }
+        return String.format("%d.%d.%d", ipInt and 0xff, (ipInt shr 8) and 0xff, (ipInt shr 16) and 0xff)
     }
 
     private fun checkPermissions() {
@@ -148,16 +193,6 @@ class ConnectionFragment : Fragment() {
         }
     }
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        if (requestCode == 1001 && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            startConnectionProcess()
-        }
-    }
-
     private fun animateClick(view: View) {
         view.animate().scaleX(0.95f).scaleY(0.95f).setDuration(100)
             .withEndAction { view.animate().scaleX(1f).scaleY(1f).setDuration(100).start() }
@@ -165,9 +200,7 @@ class ConnectionFragment : Fragment() {
     }
 
     override fun onDestroyView() {
-        isScanning = false
-        scanThread?.interrupt()
-        scanThread = null
+        searchJob?.cancel()
         _binding = null
         super.onDestroyView()
     }

@@ -97,16 +97,16 @@
                     android:orientation="horizontal"
                     android:gravity="center"
                     android:background="@color/card_background_default"
-                    android:padding="4dp"
+                    android:padding="2dp"
                     android:weightSum="3">
 
                     <TextView
                         android:id="@+id/tvLightTheme"
                         android:layout_width="0dp"
-                        android:layout_height="40dp"
+                        android:layout_height="44dp"
                         android:layout_weight="1"
-                        android:text="☀️ Светлая"
-                        android:textSize="14sp"
+                        android:text="☀️"
+                        android:textSize="18sp"
                         android:gravity="center"
                         android:background="@drawable/theme_selector_background"
                         android:textColor="@color/theme_selector_color"
@@ -116,10 +116,10 @@
                     <TextView
                         android:id="@+id/tvDarkTheme"
                         android:layout_width="0dp"
-                        android:layout_height="40dp"
+                        android:layout_height="44dp"
                         android:layout_weight="1"
-                        android:text="🌙 Темная"
-                        android:textSize="14sp"
+                        android:text="🌙"
+                        android:textSize="18sp"
                         android:gravity="center"
                         android:background="@drawable/theme_selector_background"
                         android:textColor="@color/theme_selector_color"
@@ -129,10 +129,10 @@
                     <TextView
                         android:id="@+id/tvSystemTheme"
                         android:layout_width="0dp"
-                        android:layout_height="40dp"
+                        android:layout_height="44dp"
                         android:layout_weight="1"
-                        android:text="⚙️ Системная"
-                        android:textSize="14sp"
+                        android:text="⚙️"
+                        android:textSize="18sp"
                         android:gravity="center"
                         android:background="@drawable/theme_selector_background"
                         android:textColor="@color/theme_selector_color"
@@ -140,6 +140,47 @@
                         android:focusable="true"/>
 
                 </LinearLayout>
+
+                <!-- Подписи под иконками -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:weightSum="3"
+                    android:layout_marginTop="4dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Светлая"
+                        android:textSize="11sp"
+                        android:textColor="@color/text_secondary_default"
+                        android:gravity="center"
+                        android:maxLines="1"/>
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Темная"
+                        android:textSize="11sp"
+                        android:textColor="@color/text_secondary_default"
+                        android:gravity="center"
+                        android:maxLines="1"/>
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Системная"
+                        android:textSize="11sp"
+                        android:textColor="@color/text_secondary_default"
+                        android:gravity="center"
+                        android:maxLines="1"/>
+
+                </LinearLayout>
+
 
                 <TextView
                     android:id="@+id/tvThemeAnimation"
@@ -226,6 +267,13 @@
                         android:textColor="@color/text_primary_default"
                         android:layout_marginBottom="8dp"/>
 
+                    <TextView
+                        android:id="@+id/tvTempValue"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_horizontal"
+                        android:text="22°C"/>
+
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -243,6 +291,8 @@
                             android:gravity="center"
                             android:background="@drawable/threshold_circle"/>
 
+
+
                         <SeekBar
                             android:id="@+id/seekBarTemp"
                             android:layout_width="0dp"
@@ -250,8 +300,8 @@
                             android:layout_weight="1"
                             android:layout_marginStart="12dp"
                             android:layout_marginEnd="12dp"
-                            android:max="30"
-                            android:progress="22"
+                            android:min="15"
+                            android:max="45"
                             android:progressDrawable="@drawable/seekbar_gradient"
                             android:thumb="@drawable/seekbar_thumb"
                             android:thumbTint="@color/blue_primary"
@@ -261,13 +311,17 @@
                             android:id="@+id/tvTempMax"
                             android:layout_width="40dp"
                             android:layout_height="40dp"
-                            android:text="28°"
+                            android:text="45°"
                             android:textSize="12sp"
                             android:textColor="@color/red"
                             android:gravity="center"
                             android:background="@drawable/threshold_circle"/>
 
+
+
                     </LinearLayout>
+
+
 
                     <!-- Влажность -->
                     <TextView
@@ -278,6 +332,12 @@
                         android:textColor="@color/text_primary_default"
                         android:layout_marginBottom="8dp"/>
 
+                    <TextView
+                        android:id="@+id/tvHumValue"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="22°C"/>
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -302,7 +362,8 @@
                             android:layout_weight="1"
                             android:layout_marginStart="12dp"
                             android:layout_marginEnd="12dp"
-                            android:max="30"
+                            android:min="30"
+                            android:max="100"
                             android:progress="22"
                             android:progressDrawable="@drawable/seekbar_gradient"
                             android:thumb="@drawable/seekbar_thumb"
@@ -313,7 +374,7 @@
                             android:id="@+id/tvHumMax"
                             android:layout_width="40dp"
                             android:layout_height="40dp"
-                            android:text="70%"
+                            android:text="100%"
                             android:textSize="12sp"
                             android:textColor="@color/red"
                             android:gravity="center"
@@ -329,6 +390,13 @@
                         android:textSize="14sp"
                         android:textColor="@color/text_primary_default"
                         android:layout_marginBottom="8dp"/>
+
+                    <TextView
+                        android:id="@+id/tvAqiValue"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="1200 ppm"/>
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -354,6 +422,7 @@
                             android:layout_weight="1"
                             android:layout_marginStart="12dp"
                             android:layout_marginEnd="12dp"
+                            android:min="1"
                             android:max="5"
                             android:progress="3"
                             android:progressDrawable="@drawable/seekbar_gradient_aqi"

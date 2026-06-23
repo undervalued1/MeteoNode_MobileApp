@@ -122,27 +122,32 @@ class StatisticsFragment : Fragment() {
     }
 
     private fun startLiveData() {
+        // Сначала загружаем историю с устройства
+        Thread {
+            try {
+                val history = DeviceRepository.getHistoryFromDevice()
+                activity?.runOnUiThread {
+                    if (isAdded && _binding != null) {
+                        allData.clear()
+                        allData.addAll(history)
+                        updateChart()
+                    }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }.start()
+
+        // Потом запускаем live-обновление
         isRunning = true
         liveDataThread = Thread {
             while (isRunning) {
                 try {
-                    val data = DeviceRepository.getData()
-                    if (data != null && DeviceRepository.isConnected()) {
-                        activity?.runOnUiThread {
-                            if (isAdded && _binding != null) {
-                                val item = StatisticsData(
-                                    System.currentTimeMillis(),
-                                    data.temperature,
-                                    data.humidity,
-                                    data.pressure,
-                                    data.aqi,
-                                    data.tvoc,
-                                    data.co2
-                                )
-                                allData.add(item)
-                                if (allData.size > 1000) allData.removeAt(0)
-                                updateChart()
-                            }
+                    activity?.runOnUiThread {
+                        if (isAdded && _binding != null) {
+                            allData.clear()
+                            allData.addAll(DeviceRepository.getHistory())
+                            updateChart()
                         }
                     }
                 } catch (e: Exception) {

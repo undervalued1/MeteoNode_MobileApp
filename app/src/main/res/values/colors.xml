@@ -18,7 +18,7 @@
 
     <!-- Цвета для шкалы AQI -->
     <color name="level_1">#00E400</color>
-    <color name="level_2">#FFFF00</color>
+    <color name="level_2">#FFC107</color>
     <color name="level_3">#FF7E00</color>
     <color name="level_4">#FF0000</color>
     <color name="level_5">#8F3F97</color>

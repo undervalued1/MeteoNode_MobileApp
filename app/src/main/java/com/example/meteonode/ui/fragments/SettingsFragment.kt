@@ -1,7 +1,9 @@
 package com.example.meteonode.ui.fragments
 
+import android.R.id.progress
 import android.animation.ValueAnimator
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,8 +18,9 @@ import com.example.meteonode.DeviceRepository
 import com.example.meteonode.R
 import com.example.meteonode.databinding.FragmentSettingsBinding
 import com.google.android.material.snackbar.Snackbar
-import java.util.Calendar
+import kotlinx.coroutines.*
 import org.json.JSONObject
+import java.util.Calendar
 
 class SettingsFragment : Fragment() {
 
@@ -37,6 +40,8 @@ class SettingsFragment : Fragment() {
     private lateinit var slideUpIn: Animation
     private lateinit var scalePopIn: Animation
 
+    private val coroutineScope = CoroutineScope(Dispatchers.Main + Job())
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -53,13 +58,15 @@ class SettingsFragment : Fragment() {
 
         loadAnimations()
         loadSavedSettings()
-        fetchThresholdsFromEsp()
         setupThemeSelector()
         setupSeekBars()
         setupListeners()
         setupTimePickers()
         setupCollapsibleSections()
         animateSettingsCards()
+
+        // Загружаем настройки с устройства при открытии экрана
+        fetchAllSettingsFromDevice()
     }
 
     private fun loadAnimations() {
@@ -81,6 +88,137 @@ class SettingsFragment : Fragment() {
                 view.startAnimation(slideUpIn)
             }, delay)
         }
+    }
+
+    private fun fetchAllSettingsFromDevice() {
+        binding.btnSaveSettings.isEnabled = false
+
+        coroutineScope.launch(Dispatchers.IO) {
+            try {
+                val response = DeviceRepository.getThresholds() ?: throw Exception("No response")
+                val json = JSONObject(response)
+
+                // Загружаем расписание
+                val scheduleJson = DeviceRepository.getSchedule()
+
+                withContext(Dispatchers.Main) {
+                    if (!isAdded || _binding == null) return@withContext
+
+                    // Пороговые значения
+                    binding.seekBarTemp.progress = json.optDouble("max_temp", 32.0).toInt()
+                    binding.seekBarHum.progress = json.optDouble("max_hum", 75.0).toInt()
+                    binding.seekBarAqi.progress = (json.optInt("max_co2", 1200) / 400).coerceIn(0, 5)
+
+                    // Яркость
+                    val dayB = json.optInt("day_b", 100)
+                    val nightB = json.optInt("night_b", 20)
+                    val autoB = json.optBoolean("auto_b", true)
+
+                    binding.seekBarDay.progress = dayB
+                    binding.tvDayBrightness.text = "$dayB%"
+
+                    binding.seekBarNight.progress = nightB
+                    binding.tvNightBrightness.text = "$nightB%"
+
+                    binding.switchAutoBrightness.isChecked = autoB
+
+                    // Загружаем расписание если есть
+                    if (scheduleJson != null) {
+                        try {
+                            val sched = JSONObject(scheduleJson)
+                            val timeViews = mapOf(
+                                binding.tvMonStart to "d0_start", binding.tvMonEnd to "d0_end",
+                                binding.tvTueStart to "d1_start", binding.tvTueEnd to "d1_end",
+                                binding.tvWedStart to "d2_start", binding.tvWedEnd to "d2_end",
+                                binding.tvThuStart to "d3_start", binding.tvThuEnd to "d3_end",
+                                binding.tvFriStart to "d4_start", binding.tvFriEnd to "d4_end",
+                                binding.tvSatStart to "d5_start", binding.tvSatEnd to "d5_end",
+                                binding.tvSunStart to "d6_start", binding.tvSunEnd to "d6_end"
+                            )
+                            timeViews.forEach { (view, key) ->
+                                val time = sched.optString(key, "")
+                                if (time.isNotEmpty()) {
+                                    view.text = time
+                                }
+                            }
+                        } catch (e: Exception) {
+                            Log.e("Settings", "Failed to parse schedule", e)
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                withContext(Dispatchers.Main) {
+                    if (isAdded && _binding != null) {
+                        Snackbar.make(binding.root, "Не удалось загрузить настройки с устройства", Snackbar.LENGTH_LONG).show()
+                    }
+                }
+            } finally {
+                withContext(Dispatchers.Main) {
+                    binding.btnSaveSettings.isEnabled = true
+                }
+            }
+        }
+    }
+
+    private fun saveAllSettingsToDevice() {
+        binding.btnSaveSettings.isEnabled = false
+
+        coroutineScope.launch(Dispatchers.IO) {
+            // Сохраняем пороги и яркость
+            val success = DeviceRepository.saveAllSettings(
+                maxTemp = binding.seekBarTemp.progress.toFloat(),
+                minTemp = 16f,
+                maxHum = binding.seekBarHum.progress.toFloat(),
+                minHum = 25f,
+                maxCo2 = binding.seekBarAqi.progress * 400,
+                dayBrightness = binding.seekBarDay.progress,
+                nightBrightness = binding.seekBarNight.progress,
+                autoBrightness = binding.switchAutoBrightness.isChecked
+            )
+
+            // Отправляем расписание
+            if (success) {
+                val scheduleParams = buildScheduleParams()
+                DeviceRepository.saveSchedule(scheduleParams)
+            }
+
+            if (success) {
+                DeviceRepository.syncThresholdsToLocal(requireContext())
+            }
+
+            withContext(Dispatchers.Main) {
+                binding.btnSaveSettings.isEnabled = true
+                val msg = if (success) "✅ Настройки успешно применены на устройстве!"
+                else "❌ Ошибка связи"
+                Snackbar.make(binding.root, msg, Snackbar.LENGTH_LONG).show()
+            }
+        }
+    }
+
+    private fun buildScheduleParams(): String {
+        val days = listOf(
+            binding.tvMonStart.text.toString() to binding.tvMonEnd.text.toString(),
+            binding.tvTueStart.text.toString() to binding.tvTueEnd.text.toString(),
+            binding.tvWedStart.text.toString() to binding.tvWedEnd.text.toString(),
+            binding.tvThuStart.text.toString() to binding.tvThuEnd.text.toString(),
+            binding.tvFriStart.text.toString() to binding.tvFriEnd.text.toString(),
+            binding.tvSatStart.text.toString() to binding.tvSatEnd.text.toString(),
+            binding.tvSunStart.text.toString() to binding.tvSunEnd.text.toString()
+        )
+
+        val params = StringBuilder()
+        // Если автояркость включена — используем расписание
+        val useSchedule = if (binding.switchAutoBrightness.isChecked) "1" else "0"
+        params.append("use_schedule=$useSchedule")
+
+        days.forEachIndexed { index, (start, end) ->
+            params.append("&d${index}_start=$start")
+            params.append("&d${index}_end=$end")
+        }
+
+        Log.d("SettingsFragment", "Schedule params: $params")
+        return params.toString()
     }
 
     private fun setupCollapsibleSections() {
@@ -205,31 +343,11 @@ class SettingsFragment : Fragment() {
     }
 
     private fun setupSeekBars() {
-        listOf(
-            binding.seekBarTemp to "Порог температуры установлен",
-            binding.seekBarHum to null,
-            binding.seekBarAqi to null,
-            binding.seekBarDay to null,
-            binding.seekBarNight to null
-        ).forEach { (seekBar, message) ->
-            seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-                override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                    if (seekBar == binding.seekBarDay) binding.tvDayBrightness.text = "$progress%"
-                    if (seekBar == binding.seekBarNight) binding.tvNightBrightness.text = "$progress%"
-                }
-                override fun onStartTrackingTouch(seekBar: SeekBar?) {}
-                override fun onStopTrackingTouch(seekBar: SeekBar?) {
-                    animateSeekBar(seekBar!!)
-                    animatePulse(seekBar)
-                    message?.let {
-                        Snackbar.make(binding.root, it, Snackbar.LENGTH_SHORT)
-                            .setBackgroundTint(ContextCompat.getColor(requireContext(), R.color.blue_primary))
-                            .setTextColor(ContextCompat.getColor(requireContext(), android.R.color.white))
-                            .show()
-                    }
-                }
-            })
-        }
+        binding.seekBarTemp.setOnSeekBarChangeListener(createSeekListener("Максимальная температура"))
+        binding.seekBarHum.setOnSeekBarChangeListener(createSeekListener("Максимальная влажность"))
+        binding.seekBarAqi.setOnSeekBarChangeListener(createSeekListener("Максимальный AQI"))
+        binding.seekBarDay.setOnSeekBarChangeListener(createSeekListener(null))
+        binding.seekBarNight.setOnSeekBarChangeListener(createSeekListener(null))
 
         binding.switchAutoBrightness.setOnCheckedChangeListener { _, isChecked ->
             val alpha = if (isChecked) 0.5f else 1f
@@ -240,39 +358,64 @@ class SettingsFragment : Fragment() {
         }
     }
 
-    private fun fetchThresholdsFromEsp() {
-        Thread {
-            try {
-                val response = DeviceRepository.getThresholds() ?: return@Thread
-                val json = JSONObject(response)
+    private fun createSeekListener(
+        message: String?
+    ): SeekBar.OnSeekBarChangeListener {
 
-                activity?.runOnUiThread {
-                    if (!isAdded || _binding == null) return@runOnUiThread
+        return object : SeekBar.OnSeekBarChangeListener {
 
-                    binding.seekBarTemp.progress = json.optInt("max_temp", 30)
-                    binding.seekBarHum.progress = json.optInt("max_hum", 70)
+            override fun onProgressChanged(
+                seekBar: SeekBar?,
+                progress: Int,
+                fromUser: Boolean
+            ) {
 
-                    val dayB = json.optInt("day_b", 80)
-                    val nightB = json.optInt("night_b", 40)
-                    val autoB = json.optBoolean("auto_b", false)
+                when (seekBar) {
 
-                    binding.seekBarDay.progress = dayB
-                    binding.tvDayBrightness.text = "$dayB%"
+                    binding.seekBarTemp -> {
+                        binding.tvTempValue.text = "$progress°C"
+                    }
 
-                    binding.seekBarNight.progress = nightB
-                    binding.tvNightBrightness.text = "$nightB%"
+                    binding.seekBarHum -> {
+                        binding.tvHumValue.text = "$progress%"
+                    }
 
-                    binding.switchAutoBrightness.isChecked = autoB
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-                activity?.runOnUiThread {
-                    if (isAdded && _binding != null) {
-                        Snackbar.make(binding.root, "Ошибка загрузки настроек", Snackbar.LENGTH_SHORT).show()
+                    binding.seekBarAqi -> {
+                        binding.tvAqiValue.text =
+                            "${progress * 400} ppm"
+                    }
+
+                    binding.seekBarDay -> {
+                        binding.tvDayBrightness.text =
+                            "$progress%"
+                    }
+
+                    binding.seekBarNight -> {
+                        binding.tvNightBrightness.text =
+                            "$progress%"
                     }
                 }
             }
-        }.start()
+
+            override fun onStartTrackingTouch(
+                seekBar: SeekBar?
+            ) {}
+
+            override fun onStopTrackingTouch(
+                seekBar: SeekBar?
+            ) {
+
+                val progress = seekBar?.progress ?: 0
+
+                if (message != null) {
+                    Snackbar.make(
+                        binding.root,
+                        "$message: $progress",
+                        Snackbar.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        }
     }
 
     private fun setupListeners() {
@@ -292,29 +435,28 @@ class SettingsFragment : Fragment() {
 
         binding.btnSaveSettings.setOnClickListener {
             animateClick(binding.btnSaveSettings)
-
-            val params = "max_temp=${binding.seekBarTemp.progress}" +
-                    "&max_hum=${binding.seekBarHum.progress}" +
-                    "&max_co2=1200" +
-                    "&day_b=${binding.seekBarDay.progress}" +
-                    "&night_b=${binding.seekBarNight.progress}" +
-                    "&auto_b=${if (binding.switchAutoBrightness.isChecked) "1" else "0"}"
-
-            Thread {
-                val success = DeviceRepository.setThresholds(params)
-                activity?.runOnUiThread {
-                    if (isAdded && _binding != null) {
-                        val msg = if (success) "✅ Настройки обновлены!" else "❌ Ошибка связи"
-                        Snackbar.make(binding.root, msg, Snackbar.LENGTH_LONG).show()
-                    }
-                }
-            }.start()
+            saveAllSettingsToDevice()
         }
 
-        listOf(binding.chkTempAlert, binding.chkHumAlert, binding.chkAqiAlert, binding.chkPressureAlert).forEach { chk ->
-            chk.setOnCheckedChangeListener { _, isChecked ->
-                if (isChecked) animatePulse(chk)
-            }
+        // Чекбоксы — сохраняем состояние
+        binding.chkTempAlert.setOnCheckedChangeListener { _, isChecked ->
+            sharedPref.edit().putBoolean("alert_temp", isChecked).apply()
+            if (isChecked) animatePulse(binding.chkTempAlert)
+        }
+
+        binding.chkHumAlert.setOnCheckedChangeListener { _, isChecked ->
+            sharedPref.edit().putBoolean("alert_hum", isChecked).apply()
+            if (isChecked) animatePulse(binding.chkHumAlert)
+        }
+
+        binding.chkAqiAlert.setOnCheckedChangeListener { _, isChecked ->
+            sharedPref.edit().putBoolean("alert_aqi", isChecked).apply()
+            if (isChecked) animatePulse(binding.chkAqiAlert)
+        }
+
+        binding.chkPressureAlert.setOnCheckedChangeListener { _, isChecked ->
+            sharedPref.edit().putBoolean("alert_pressure", isChecked).apply()
+            if (isChecked) animatePulse(binding.chkPressureAlert)
         }
     }
 
@@ -373,6 +515,12 @@ class SettingsFragment : Fragment() {
         } else {
             binding.layoutNotificationsContent.visibility = View.GONE
         }
+
+        // Восстанавливаем чекбоксы
+        binding.chkTempAlert.isChecked = sharedPref.getBoolean("alert_temp", true)
+        binding.chkHumAlert.isChecked = sharedPref.getBoolean("alert_hum", true)
+        binding.chkAqiAlert.isChecked = sharedPref.getBoolean("alert_aqi", true)
+        binding.chkPressureAlert.isChecked = sharedPref.getBoolean("alert_pressure", true)
     }
 
     private fun animateClick(view: View) {
@@ -396,6 +544,7 @@ class SettingsFragment : Fragment() {
     }
 
     override fun onDestroyView() {
+        coroutineScope.cancel()
         _binding = null
         super.onDestroyView()
     }
